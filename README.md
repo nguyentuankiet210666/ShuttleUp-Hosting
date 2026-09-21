@@ -29,31 +29,30 @@ ShuttleUp Hosting là ứng dụng Android giúp cộng đồng cầu lông dễ
 ### 1. Tải mã nguồn
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/shuttleup-hosting.git
+git clone https://github.com/nguyentuankiet210666/ShuttleUp-Hosting.git
 ```
 
 ### 2. Mở dự án
 
 1. Khởi động Android Studio.
 2. Chọn **Open**.
-3. Chọn thư mục `shuttleup-hosting`.
+3. Chọn thư mục `ShuttleUp-Hosting`.
 4. Chờ Android Studio đồng bộ dự án.
 
 ### 3. Chạy ứng dụng
 
 1. Khởi động máy ảo Android hoặc kết nối điện thoại.
-2. Nhấn nút **Run ▶** trong Android Studio.
+2. Nhấn **Run ▶** trong Android Studio.
 3. Chọn thiết bị để cài đặt và chạy ứng dụng.
 
 ## 🔐 Bảo mật
 
 Không đưa các thông tin sau lên GitHub:
 
-- API key
-- Mật khẩu
+- API key và mật khẩu
 - File `local.properties`
 - File `.env`
-- File ký ứng dụng `.jks` hoặc `.keystore`
+- File `.jks` hoặc `.keystore`
 - Thông tin cấu hình riêng tư
 
 ## 🗺️ Kế hoạch phát triển
@@ -69,7 +68,7 @@ Không đưa các thông tin sau lên GitHub:
 
 ## 🤝 Đóng góp
 
-Mọi ý kiến và đóng góp đều được chào đón. Bạn có thể tạo **Issue** để báo lỗi hoặc gửi **Pull Request** để đề xuất thay đổi.
+Bạn có thể tạo **Issue** để báo lỗi hoặc gửi **Pull Request** để đề xuất thay đổi tại repository [ShuttleUp Hosting](https://github.com/nguyentuankiet210666/ShuttleUp-Hosting).
 
 ## 📄 Giấy phép
 
