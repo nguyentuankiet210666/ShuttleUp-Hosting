@@ -1,79 +1,91 @@
 # 🏸 ShuttleUp Hosting
 
-**Host. Join. Play.**
+**Hosting** là ứng dụng Android hỗ trợ host quản lý một buổi chơi cầu lông ngay trên điện thoại.
 
-ShuttleUp Hosting là ứng dụng Android giúp cộng đồng cầu lông dễ dàng tạo, quản lý và tham gia các buổi chơi. Người tổ chức có thể thiết lập thông tin trận đấu, theo dõi người tham gia và quản lý kèo ngay trên điện thoại.
+## ✅ Chức năng hiện có
 
-## ✨ Tính năng
+- Thêm, sửa và xoá người chơi
+- Ghi giờ vào / giờ ra
+- Tăng giảm số set
+- Nhập tiền chơi và nợ nước
+- Check thanh toán: tiền mặt / chuyển khoản / chưa thanh toán
+- Chụp hoặc chọn ảnh biên lai chuyển khoản
+- Gợi ý 4 người cho set tiếp theo
+- Theo dõi số lượng cầu và đơn giá cầu
+- Tổng hợp tiền trong buổi chơi
 
-- Tạo và quản lý buổi chơi cầu lông
-- Thiết lập thời gian và địa điểm
-- Chọn trình độ người chơi
-- Giới hạn số lượng người tham gia
-- Tham gia hoặc rời khỏi một buổi chơi
-- Theo dõi danh sách người tham gia
-- Cập nhật trạng thái của buổi chơi
+## 🧱 Kiến trúc hiện tại
 
-## 🛠️ Công nghệ
+Ứng dụng hiện dùng:
 
-- Android Studio
-- Kotlin
-- Jetpack Compose hoặc XML Layout
+- Kotlin cho Android host
+- WebView để hiển thị giao diện
+- HTML/CSS/JavaScript trong `app/src/main/assets/index.html`
+- `localStorage` để lưu dữ liệu trên thiết bị
+- Firebase Auth + Firestore đã được thêm dependency để chuẩn bị đồng bộ cloud
+
+> Firebase chưa hoạt động cho đến khi bạn tạo Firebase project và thêm file `app/google-services.json`.
+
+## 🔥 Firebase
+
+Nhánh này đã chuẩn bị nền tảng cho:
+
 - Firebase Authentication
 - Cloud Firestore
+- Dữ liệu tách riêng theo tài khoản host
+- Đồng bộ nhiều điện thoại trong các bước tiếp theo
 
-> Danh sách công nghệ có thể được cập nhật tùy theo quá trình phát triển.
+Xem hướng dẫn: [FIREBASE_SETUP.md](FIREBASE_SETUP.md)
 
-## 🚀 Cài đặt dự án
-
-### 1. Tải mã nguồn
+## 🚀 Chạy dự án
 
 ```bash
 git clone https://github.com/nguyentuankiet210666/ShuttleUp-Hosting.git
 ```
 
-### 2. Mở dự án
+Sau đó:
 
-1. Khởi động Android Studio.
-2. Chọn **Open**.
-3. Chọn thư mục `ShuttleUp-Hosting`.
-4. Chờ Android Studio đồng bộ dự án.
+1. Mở Android Studio.
+2. Chọn **Open** và mở thư mục dự án.
+3. Chờ Gradle Sync hoàn tất.
+4. Chạy bằng Android Emulator hoặc điện thoại thật.
+5. Nhấn **Run ▶**.
 
-### 3. Chạy ứng dụng
-
-1. Khởi động máy ảo Android hoặc kết nối điện thoại.
-2. Nhấn **Run ▶** trong Android Studio.
-3. Chọn thiết bị để cài đặt và chạy ứng dụng.
+Nếu chưa cấu hình Firebase, app vẫn build và dùng dữ liệu local như trước.
 
 ## 🔐 Bảo mật
 
-Không đưa các thông tin sau lên GitHub:
+Không commit các file hoặc thông tin nhạy cảm:
 
-- API key và mật khẩu
-- File `local.properties`
-- File `.env`
-- File `.jks` hoặc `.keystore`
-- Thông tin cấu hình riêng tư
+- `app/google-services.json`
+- `local.properties`
+- file `.jks` / `.keystore`
+- mật khẩu hoặc secret key
 
-## 🗺️ Kế hoạch phát triển
+Firestore nên lưu dữ liệu theo cấu trúc:
 
-- [ ] Đăng ký và đăng nhập
-- [ ] Tạo buổi chơi mới
-- [ ] Tìm kiếm buổi chơi gần nhất
-- [ ] Tham gia buổi chơi
-- [ ] Quản lý người tham gia
-- [ ] Thông báo khi có thay đổi
-- [ ] Đánh giá người chơi và host
-- [ ] Tích hợp bản đồ và vị trí sân
+```text
+users/{uid}
+  sessions/{sessionId}
+    players/{playerId}
+```
 
-## 🤝 Đóng góp
+Nhờ đó security rules có thể giới hạn mỗi tài khoản chỉ đọc/ghi dữ liệu của chính mình.
 
-Bạn có thể tạo **Issue** để báo lỗi hoặc gửi **Pull Request** để đề xuất thay đổi tại repository [ShuttleUp Hosting](https://github.com/nguyentuankiet210666/ShuttleUp-Hosting).
+## 🗺️ Lộ trình
 
-## 📄 Giấy phép
+- [x] App Android chạy trên điện thoại
+- [x] Quản lý người chơi, set và thanh toán
+- [x] Chuẩn bị Firebase dependencies
+- [ ] Tạo Firebase project + thêm google-services.json
+- [ ] Đăng nhập Google
+- [ ] Đăng nhập số điện thoại
+- [ ] Đồng bộ dữ liệu Firestore
+- [ ] Lịch sử nhiều buổi chơi
+- [ ] Đồng bộ nhiều thiết bị
+- [ ] Google Sheets
+- [ ] Thống kê doanh thu
 
-Dự án hiện được phát triển cho mục đích học tập. Thông tin giấy phép sẽ được bổ sung sau.
+## 📄 Ghi chú
 
----
-
-Made with ❤️ for the badminton community.
+Dự án đang trong quá trình phát triển và hiện ưu tiên chức năng quản lý nội bộ cho host cầu lông.
