@@ -13,3 +13,10 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Firebase project-specific Android config
+app/google-services.json
+
+# Signing keys
+*.jks
+*.keystore
