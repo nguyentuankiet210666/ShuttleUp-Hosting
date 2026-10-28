@@ -97,18 +97,18 @@
         .court-markings,.court-markings span{position:absolute;pointer-events:none}
         .court-markings{inset:0;z-index:1}
         .court-outer{inset:9px;border:2px solid #e8fff1e0}
-        .court-singles{inset:9px 12%;border-left:1.5px solid #ddfff0c0;border-right:1.5px solid #ddfff0c0}
-        .court-back{left:9px;right:9px;height:1.5px;background:#d8fff0c2}
-        .court-back-top{top:11%}.court-back-bottom{bottom:11%}
-        .court-service{left:9px;right:9px;height:1.5px;background:#e5fff0c7}
-        .court-service-top{top:34%}.court-service-bottom{bottom:34%}
-        .court-center{left:50%;width:1.5px;transform:translateX(-50%);background:#e5fff0b0}
-        .court-center-top{top:9px;height:calc(34% - 9px)}
-        .court-center-bottom{bottom:9px;height:calc(34% - 9px)}
-        .court-net{top:50%;left:0;right:0;height:7px;transform:translateY(-50%);border-top:2px solid #f6fff1;border-bottom:1px solid #caffed77;background:repeating-linear-gradient(90deg,#e9fff2a8 0 1px,#ffffff16 1px 7px);box-shadow:0 2px 4px #0b292549;z-index:2}
-        .court-side{position:absolute;z-index:2;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:1.5px;font-weight:850;color:#e5fff0bf;pointer-events:none}
-        .court-side-a{top:12px}.court-side-b{top:calc(50% + 9px)}
-        .court-slots{position:absolute;z-index:3;inset:29px 17px 11px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));align-items:center;justify-items:center;gap:12px 6px}
+        .court-singles{inset:12% 9px;border-top:1.5px solid #ddfff0c0;border-bottom:1.5px solid #ddfff0c0}
+        .court-back{top:9px;bottom:9px;width:1.5px;background:#d8fff0c2}
+        .court-back-left{left:11%}.court-back-right{right:11%}
+        .court-service{top:9px;bottom:9px;width:1.5px;background:#e5fff0c7}
+        .court-service-left{left:34%}.court-service-right{right:34%}
+        .court-center{top:50%;height:1.5px;transform:translateY(-50%);background:#e5fff0b0}
+        .court-center-left{left:9px;width:calc(34% - 9px)}
+        .court-center-right{right:9px;width:calc(34% - 9px)}
+        .court-net{left:50%;top:0;bottom:0;width:7px;transform:translateX(-50%);border-left:2px solid #f6fff1;border-right:1px solid #caffed77;background:repeating-linear-gradient(0deg,#e9fff2a8 0 1px,#ffffff16 1px 7px);box-shadow:2px 0 4px #0b292549;z-index:2}
+        .court-side{position:absolute;z-index:2;top:13px;transform:translateX(-50%);font-size:9px;letter-spacing:1.5px;font-weight:850;color:#e5fff0bf;pointer-events:none}
+        .court-side-a{left:75%}.court-side-b{left:25%}
+        .court-slots{position:absolute;z-index:3;inset:31px 17px 11px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));align-items:center;justify-items:center;gap:12px 6px}
         .court-slot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:100%;max-width:130px;min-width:0;min-height:69px;padding:5px 4px;border-radius:10px;line-height:1.1;text-align:center;touch-action:manipulation}
         .court-slot.filled{border:1px solid #eaffef;background:#f6fffaf3;box-shadow:0 2px 8px #082c253a;color:#1a5647}
         .court-slot.empty{border:1.5px dashed #e5fff0bd;background:#073d3282;color:#ecfff2}
@@ -160,16 +160,16 @@
   </div>
   <div class="set-selection">
     <div class="set-section-line"><strong>Sân tiếp theo</strong><span class="set-progress" id="setProgress">0/4</span></div>
-    <div class="badminton-court" role="group" aria-label="Sân cầu lông đánh đôi với bốn vị trí, hai người mỗi bên">
+    <div class="badminton-court" role="group" aria-label="Sân cầu lông đánh đôi: đội B bên trái, đội A bên phải, ngăn bởi lưới dọc">
       <div class="court-markings" aria-hidden="true">
         <span class="court-outer"></span>
         <span class="court-singles"></span>
-        <span class="court-back court-back-top"></span>
-        <span class="court-back court-back-bottom"></span>
-        <span class="court-service court-service-top"></span>
-        <span class="court-service court-service-bottom"></span>
-        <span class="court-center court-center-top"></span>
-        <span class="court-center court-center-bottom"></span>
+        <span class="court-back court-back-left"></span>
+        <span class="court-back court-back-right"></span>
+        <span class="court-service court-service-left"></span>
+        <span class="court-service court-service-right"></span>
+        <span class="court-center court-center-left"></span>
+        <span class="court-center court-center-right"></span>
         <span class="court-net"></span>
       </div>
       <span class="court-side court-side-a" aria-hidden="true">ĐỘI A</span>
@@ -221,19 +221,22 @@
       $('selectionCount').textContent=count+'/4 người';
       $('setProgress').textContent=count+'/4';
       $('confirmSet').disabled=count!==4;
-      $('setSlots').innerHTML=Array.from({length:4},(_,index)=>{
+      // Column-major teams: A uses picks 1-2 (right), B picks 3-4 (left).
+      // DOM grid order remains left-top, right-top, left-bottom, right-bottom.
+      $('setSlots').innerHTML=[2,0,3,1].map(index=>{
+        const side=index<2?'A':'B',teamPosition=index%2+1;
         const id=[...selected][index],p=id&&state.players.find(player=>player.id===id);
         if(p){
           const shortName=p.name.trim().split(/\s+/).slice(-2).join(' ');
-          return `<button class="court-slot filled" type="button" data-remove="${escapeHTML(p.id)}" aria-label="Bỏ chọn ${escapeHTML(p.name)} khỏi sân">
+          return `<button class="court-slot filled" type="button" data-remove="${escapeHTML(p.id)}" aria-label="Bỏ chọn ${escapeHTML(p.name)} khỏi đội ${side}">
             <span class="court-avatar" aria-hidden="true">${escapeHTML(p.name.trim().charAt(0).toUpperCase()||'?')}</span>
             <strong class="court-name">${escapeHTML(shortName)}</strong>
             <small class="court-count">${p.sets} set <span aria-hidden="true">· ×</span></small>
           </button>`;
         }
-        return `<button class="court-slot empty" type="button" data-choose="${index}" aria-label="Chọn người cho vị trí ${index+1}">
+        return `<button class="court-slot empty" type="button" data-choose="${index}" aria-label="Chọn người cho đội ${side}, vị trí ${teamPosition}">
           <span class="court-empty-plus" aria-hidden="true">+</span>
-          <span class="court-empty-label">Vị trí ${index+1}</span>
+          <span class="court-empty-label">Đội ${side} · ${teamPosition}</span>
           <small>Chọn người</small>
         </button>`;
       }).join('');
