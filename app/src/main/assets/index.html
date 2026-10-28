@@ -92,13 +92,42 @@
         .set-section-line strong{font-size:14px;color:#20374b}
         .set-section-line span{font-size:11px;color:#65788a}
         .set-progress{background:#e7f0ff;color:#1763db!important;border-radius:99px;font-weight:800;padding:5px 9px}
-        .set-slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-        .set-slot{min-width:0;min-height:55px;display:flex;align-items:center;gap:7px;border:1px dashed #c6d4e2;background:#f8fbfe;color:#74889a;text-align:left;padding:8px;border-radius:11px;font-size:12px}
-        .set-slot .slot-no{display:grid;place-items:center;flex:0 0 22px;height:22px;background:#e8eff6;border-radius:50%;font-weight:800;font-size:11px}
-        .set-slot strong{font-size:12px;min-width:0;flex:1;color:#174d86;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .set-slot .slot-plus,.set-slot .slot-remove{margin-left:auto;font-size:16px;font-weight:700}
-        .set-slot.filled{border:1px solid #a5c4ed;background:#eef5ff;color:#1c60b5}
-        .set-slot.filled .slot-no{background:#1763db;color:white}
+        /* Portrait badminton court: four real touch targets on an illustrated court */
+        .court-caption{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-2px 1px 8px;font-size:10px;color:#6b7d90}
+        .court-caption span:first-child{font-weight:750;color:#29705e}
+        .badminton-court{position:relative;width:100%;height:clamp(318px,100vw,390px);overflow:hidden;border-radius:16px;background:radial-gradient(ellipse at 30% 17%,#24836d 0%,#176c59 48%,#125544 100%);box-shadow:inset 0 0 0 4px #0f5346, inset 0 0 0 7px #e5fff25c, 0 7px 20px #102f2440;isolation:isolate}
+        .badminton-court:before{content:'';position:absolute;inset:0;background:linear-gradient(120deg,#ffffff0b,transparent 55%),repeating-linear-gradient(0deg,transparent 0 21px,#062f2707 21px 22px);pointer-events:none}
+        .court-markings,.court-markings span{position:absolute;pointer-events:none}
+        .court-markings{inset:0;z-index:1}
+        .court-outer{inset:14px;border:2px solid #d8fff0e8}
+        .court-singles{inset:14px 12%;border-left:2px solid #ddfff0a6;border-right:2px solid #ddfff0a6}
+        .court-back{left:14px;right:14px;height:2px;background:#d8fff0c2}
+        .court-back-top{top:11%}.court-back-bottom{bottom:11%}
+        .court-service{left:14px;right:14px;height:2px;background:#e5fff0c7}
+        .court-service-top{top:34%}.court-service-bottom{bottom:34%}
+        .court-center{left:50%;width:2px;transform:translateX(-50%);background:#e5fff0b0}
+        .court-center-top{top:14px;height:calc(34% - 14px)}
+        .court-center-bottom{bottom:14px;height:calc(34% - 14px)}
+        .court-net{top:50%;left:0;right:0;height:9px;transform:translateY(-50%);border-top:2px solid #f6fff1;border-bottom:1px solid #caffed77;background:repeating-linear-gradient(90deg,#e9fff2a8 0 1px,#ffffff16 1px 8px);box-shadow:0 3px 6px #0b292549;z-index:2}
+        .court-side{position:absolute;z-index:2;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:2px;font-weight:850;color:#e5fff0aa;pointer-events:none}
+        .court-side-a{top:21px}.court-side-b{top:calc(50% + 17px)}
+        .court-slots{position:absolute;z-index:3;inset:42px 21px 25px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));align-items:center;justify-items:center;gap:20px 8px}
+        .court-slot{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;max-width:132px;min-height:94px;padding:9px 5px;border-radius:14px;line-height:1.1;text-align:center;touch-action:manipulation}
+        .court-slot.filled{border:1px solid #eaffef;background:#f6fffaf5;box-shadow:0 5px 14px #082c2545;color:#1a5647}
+        .court-slot.empty{border:2px dashed #e5fff09c;background:#073d3280;color:#ecfff2}
+        .court-slot:focus-visible{outline:3px solid #fff;outline-offset:3px}
+        .court-avatar{width:29px;height:29px;border-radius:50%;display:grid;place-items:center;background:#b7eee0;color:#12614c;font-size:13px;font-weight:850}
+        .court-name{display:block;max-width:100%;font-size:12px;line-height:1.15;color:#165744;overflow-wrap:anywhere}
+        .court-count{font-size:10px;color:#3f7666}
+        .court-empty-plus{font-size:21px;font-weight:500;line-height:1}
+        .court-empty-label{font-size:12px;font-weight:800}
+        .court-slot.empty small{font-size:10px;color:#d1f1e6}
+        @media(max-width:350px){
+          .badminton-court{height:312px}.court-slots{inset:38px 13px 19px;gap:16px 6px}
+          .court-slot{min-height:84px;max-width:120px}
+          .court-caption{font-size:9px}.court-name{font-size:11px}
+        }
+        @media(min-width:560px){.badminton-court{max-width:420px;margin:auto;height:410px}.court-caption{max-width:420px;margin:0 auto 9px}}
         .set-suggest{width:100%;min-height:48px;margin-top:10px;background:#e8f1ff;color:#1254ae;border:1px solid #c3dafb;border-radius:10px;font-size:13px;font-weight:750}
         .set-list-title{margin:17px 2px 8px}
         .set-players{display:grid;gap:8px}
@@ -119,7 +148,7 @@
         .set-action-count small{font-size:11px;color:#72869b}
         .set-action-count strong{font-size:16px;color:#175da8}
         .set-action button{min-height:49px;flex:1;max-width:245px;font-size:13px}
-        @media(max-width:350px){.set-top .section-title{font-size:17px}.set-player{gap:7px;padding:7px}.set-player-count{font-size:11px}.set-avatar{flex-basis:33px;height:33px}.set-slot{padding:6px;gap:5px}.set-section-line span{font-size:10px}}
+        @media(max-width:350px){.set-top .section-title{font-size:17px}.set-player{gap:7px;padding:7px}.set-player-count{font-size:11px}.set-avatar{flex-basis:33px;height:33px}.set-section-line span{font-size:10px}}
         @media(min-width:600px){#sets{max-width:680px;margin:auto}.set-player{min-height:70px}.set-action{padding-left:max(12px,calc((100vw - 670px)/2));padding-right:max(12px,calc((100vw - 670px)/2))}}
 
     </style>
@@ -134,7 +163,23 @@
   </div>
   <div class="set-selection">
     <div class="set-section-line"><strong>Đội hình set mới</strong><span class="set-progress" id="setProgress">0/4</span></div>
-    <div id="setSlots" class="set-slots" aria-live="polite"></div>
+    <div class="court-caption"><span>Đánh đôi · 2 đấu 2</span><span>Chạm vào người trên sân để bỏ chọn</span></div>
+    <div class="badminton-court" role="group" aria-label="Sân cầu lông đánh đôi với bốn vị trí, hai người mỗi bên">
+      <div class="court-markings" aria-hidden="true">
+        <span class="court-outer"></span>
+        <span class="court-singles"></span>
+        <span class="court-back court-back-top"></span>
+        <span class="court-back court-back-bottom"></span>
+        <span class="court-service court-service-top"></span>
+        <span class="court-service court-service-bottom"></span>
+        <span class="court-center court-center-top"></span>
+        <span class="court-center court-center-bottom"></span>
+        <span class="court-net"></span>
+      </div>
+      <span class="court-side court-side-a" aria-hidden="true">ĐỘI A</span>
+      <span class="court-side court-side-b" aria-hidden="true">ĐỘI B</span>
+      <div id="setSlots" class="court-slots" aria-live="polite"></div>
+    </div>
     <button id="suggest" type="button" class="set-suggest">✨ Gợi ý 4 người ít set nhất</button>
   </div>
   <div class="set-section-line set-list-title"><strong>Danh sách người chơi</strong><span>Chạm để chọn hoặc bỏ chọn</span></div>
@@ -182,8 +227,19 @@
       $('confirmSet').disabled=count!==4;
       $('setSlots').innerHTML=Array.from({length:4},(_,index)=>{
         const id=[...selected][index],p=id&&state.players.find(player=>player.id===id);
-        return p?`<button class="set-slot filled" type="button" data-remove="${escapeHTML(p.id)}" aria-label="Bỏ chọn ${escapeHTML(p.name)}"><span class="slot-no">${index+1}</span><strong>${escapeHTML(p.name)}</strong><span class="slot-remove" aria-hidden="true">×</span></button>`:
-          `<div class="set-slot empty"><span class="slot-no">${index+1}</span><span>Chưa chọn</span><span class="slot-plus" aria-hidden="true">+</span></div>`;
+        if(p){
+          const shortName=p.name.trim().split(/\s+/).slice(-2).join(' ');
+          return `<button class="court-slot filled" type="button" data-remove="${escapeHTML(p.id)}" aria-label="Bỏ chọn ${escapeHTML(p.name)} khỏi sân">
+            <span class="court-avatar" aria-hidden="true">${escapeHTML(p.name.trim().charAt(0).toUpperCase()||'?')}</span>
+            <strong class="court-name">${escapeHTML(shortName)}</strong>
+            <small class="court-count">${p.sets} set <span aria-hidden="true">· ×</span></small>
+          </button>`;
+        }
+        return `<button class="court-slot empty" type="button" data-choose="${index}" aria-label="Chọn người cho vị trí ${index+1}">
+          <span class="court-empty-plus" aria-hidden="true">+</span>
+          <span class="court-empty-label">Vị trí ${index+1}</span>
+          <small>Chọn người</small>
+        </button>`;
       }).join('');
       $('setPlayers').querySelectorAll('.set-player').forEach(row=>{
         const input=row.querySelector('input');
@@ -246,7 +302,11 @@
     $('playerForm').onsubmit=e=>{e.preventDefault();const name=$('playerName').value.trim();if(!name){$('playerName').setCustomValidity('Vui lòng nhập tên người chơi');$('playerName').reportValidity();return}if(editId){const p=state.players.find(p=>p.id===editId);if(p.end!==$('timeOut').value)delete p.autoOut;Object.assign(p,{name,start:$('timeIn').value,end:$('timeOut').value})}else state.players.push({id:'p'+Date.now()+Math.random().toString(36).slice(2,7),name,start:$('timeIn').value,end:$('timeOut').value,sets:0,money:0,water:0,payment:'unpaid'});save();closeSheet();render();toast('Đã lưu người chơi')};$('playerName').oninput=()=>$('playerName').setCustomValidity('');
     $('sessionDate').onchange=()=>{if($('sessionDate').value){state.date=$('sessionDate').value;save()}else $('sessionDate').value=state.date};
     $('setPlayers').onchange=e=>{if(e.target.checked)selected.add(e.target.value);else selected.delete(e.target.value);updateSelection()};
-    $('setSlots').onclick=e=>{const remove=e.target.closest('button[data-remove]');if(!remove)return;selected.delete(remove.dataset.remove);renderSet()};
+    $('setSlots').onclick=e=>{
+      const remove=e.target.closest('button[data-remove]');
+      if(remove){selected.delete(remove.dataset.remove);renderSet();return}
+      if(e.target.closest('button[data-choose]'))$('setPlayers').scrollIntoView({behavior:'smooth',block:'center'});
+    };
     $('suggest').onclick=()=>{const available=state.players.filter(p=>!isDone(p)).sort((a,b)=>a.sets-b.sets);selected=new Set(available.slice(0,4).map(p=>p.id));renderSet();if(available.length<4)toast('Cần ít nhất 4 người đang chơi')};
     $('confirmSet').onclick=()=>{if(selected.size!==4)return;state.players.filter(p=>selected.has(p.id)&&!isDone(p)).forEach(p=>p.sets++);selected.clear();save();render();toast('Đã cộng 1 set cho 4 người')};
     $('sheets').onclick=()=>toast('Bản demo chưa kết nối Google Sheets');
