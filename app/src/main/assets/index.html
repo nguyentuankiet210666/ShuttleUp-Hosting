@@ -19,6 +19,67 @@
         header{padding:calc(6px + env(safe-area-inset-top,0px)) 8px 7px}header>.wrap{display:grid;grid-template-columns:1fr 160px;gap:5px 8px}.brand{margin:0;gap:5px}.brand h1{font-size:18px}.brand small{display:none}.logo{font-size:22px}.date{padding:0 4px}.date input{min-height:36px;padding:4px;font-size:12px}.tabs{grid-column:1/-1;margin-top:0;gap:5px}.tabs button{min-height:36px}main{padding:6px 6px calc(62px + env(safe-area-inset-bottom,0px))}.add{min-height:40px;margin-bottom:6px}#players{border-radius:10px;overflow:hidden;border:1px solid var(--line)}#players:empty{border:0}.player-card{margin:0!important;border:0!important;border-left:3px solid!important;border-bottom:1px solid #dbe3eb!important;border-radius:0;padding:3px 7px 7px;box-shadow:none}.player-card:last-child{border-bottom:0!important}.player-card.status-cash{border-left-color:#27864c!important}.player-card.status-transfer{border-left-color:#3476cc!important}.player-card.status-unpaid{border-left-color:#cf9b30!important}.person{gap:5px;margin:0}.number{flex-basis:19px;height:19px;font-size:10px}.name{font-size:13px}.name-edit{min-height:36px;padding:2px 0}.time{font-size:10px}.fields{grid-template-columns:92px minmax(0,1fr) minmax(0,.85fr) minmax(0,1.15fr);gap:5px;align-items:end}.fields .label{font-size:10px;margin:0 0 2px}.fields input{height:40px;min-height:40px;padding:5px;font-size:12px;font-weight:600}.stepper{height:40px}.stepper button{min-width:28px;min-height:40px;font-size:17px}.stepper .plus{min-width:38px;font-size:11px}.stepper output{font-size:12px}.total{min-height:54px;height:54px;border-radius:7px}.total .amount{font-size:13px}.total small{font-size:8px}.bottom button{min-height:44px}.bottom{padding-top:2px;padding-bottom:calc(2px + env(safe-area-inset-bottom,0px))}.summary strong{overflow-wrap:anywhere}@media(max-width:350px){header>.wrap{grid-template-columns:1fr 145px}.fields{grid-template-columns:84px minmax(0,1fr) minmax(0,.8fr) minmax(0,1.15fr);gap:4px}.player-card{padding-left:5px;padding-right:5px}.stepper button{min-width:25px}.stepper .plus{min-width:35px}.total .amount{font-size:12px}.name{font-size:12px}.fields input{font-size:11px;padding:4px}}
         .home-shuttles{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:3px 7px;margin-bottom:6px}.home-shuttles>label{font-size:12px;font-weight:650}.home-shuttles .shuttle-counter{gap:5px;width:170px}.home-shuttles .shuttle-counter button{min-width:38px;min-height:38px;padding:4px 9px;font-size:12px}.home-shuttles .shuttle-counter input{min-height:38px;height:38px;font-size:15px;padding:3px}.shuttle-cost{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;background:#fff5e3;border:1px solid #ecd8af;border-radius:10px}.shuttle-cost small{display:block;color:#786548;margin-top:3px;font-size:11px}.shuttle-cost strong{font-size:20px;color:#95600c}#shuttlePriceError{color:#b42318}
         .receipt-sources{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}.water-summary{margin:10px 0}.water-summary small{display:block;margin-top:4px}
+    
+        /* Mobile-first touch optimization: compact cards, readable totals and safe-area navigation. */
+        :root{--touch:46px;--nav-height:62px}
+        html{-webkit-text-size-adjust:100%;scroll-padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+        body{overscroll-behavior-y:contain}
+        button{-webkit-tap-highlight-color:transparent}
+        button:active{filter:brightness(.95)}
+        header{position:sticky;top:0;z-index:12;box-shadow:0 2px 8px #102c4512}
+        header>.wrap{max-width:680px}
+        .tabs button{font-size:12px;font-weight:700;min-height:40px}
+        main{padding:9px 9px calc(92px + env(safe-area-inset-bottom,0px))}
+        .add{min-height:48px;font-size:14px;font-weight:750;border-radius:11px}
+        .home-shuttles{padding:7px 10px;margin-bottom:9px}
+        .home-shuttles>label{font-size:13px}
+        .home-shuttles .shuttle-counter button{min-width:44px;min-height:44px}
+        .home-shuttles .shuttle-counter input{min-height:44px;height:44px}
+        #players{border:0;overflow:visible;display:grid;gap:9px}
+        .player-card{border:1px solid var(--line)!important;border-left:4px solid!important;border-radius:12px!important;box-shadow:0 2px 7px #1838560a;padding:9px 10px 10px;margin:0!important}
+        .person{gap:7px;margin-bottom:7px}
+        .number{flex-basis:23px;height:23px;font-size:11px}
+        .name{font-size:14px}
+        .name-edit{min-height:40px;display:flex;align-items:center;font-size:14px}
+        .time{font-size:11px}
+        .fields{grid-template-columns:minmax(103px,1.1fr) minmax(0,1fr) minmax(0,1fr) minmax(95px,1.15fr);gap:6px}
+        .fields .label{font-size:11px;margin-bottom:4px}
+        .fields input{min-height:46px;height:46px;font-size:14px;padding:5px 6px}
+        .stepper{height:46px}
+        .stepper button{min-height:46px;min-width:31px;font-size:20px}
+        .stepper .plus{min-width:42px;font-size:12px}
+        .stepper output{font-size:14px}
+        .total{height:61px;min-height:61px}
+        .total .amount{font-size:14px}
+        .total small{font-size:9px}
+        .bottom{box-shadow:0 -4px 15px #122a4912;padding:4px 8px calc(5px + env(safe-area-inset-bottom,0px))}
+        .bottom .wrap{gap:8px}
+        .bottom button{min-height:53px;border-radius:12px;font-size:11px;font-weight:700;justify-content:center}
+        .bottom b{font-size:20px;line-height:21px}
+        .bottom .active{background:#e8f1ff;color:#124fa8}
+        .section-title{font-size:16px}
+        .summary{gap:8px;padding:12px}
+        .summary strong{font-size:17px}
+        .overlay{z-index:35}
+        .sheet{padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+        .pay-buttons button{min-height:54px}
+        @media(max-width:420px){
+          .fields{grid-template-columns:100px minmax(0,1fr) minmax(0,1fr);gap:7px}
+          .fields>.total{grid-column:1/-1;min-height:48px;height:48px;flex-direction:row;gap:7px}
+          .total .amount{font-size:17px}
+          .total small{font-size:10px}
+          .fields .label{font-size:10px}
+          .fields input{font-size:13px}
+        }
+        @media(max-width:350px){
+          header>.wrap{grid-template-columns:1fr 140px}
+          .fields{grid-template-columns:94px minmax(0,1fr) minmax(0,1fr);gap:5px}
+          .player-card{padding:7px!important}
+          .time{font-size:10px}
+          .home-shuttles .shuttle-counter{width:153px}
+        }
+        @media(min-width:600px){.fields{grid-template-columns:125px 1fr 1fr 130px}.fields>.total{grid-column:auto;height:61px}}
+
     </style>
 </head>
 <body>
