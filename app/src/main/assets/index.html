@@ -92,7 +92,7 @@
         .set-section-line strong{font-size:13px;color:#20374b}
         .set-section-line span{font-size:10px;color:#65788a}
         .set-progress{background:#e7f0ff;color:#1763db!important;border-radius:99px;font-weight:800;padding:4px 9px}
-        .badminton-court{position:relative;overflow:hidden;isolation:isolate;width:100%;height:clamp(218px,64vw,252px);border-radius:11px;background:radial-gradient(ellipse at 25% 20%,#27866d 0%,#176b58 50%,#115443 100%);box-shadow:inset 0 0 0 3px #0c5142,0 3px 9px #143c3033}
+        .badminton-court{position:relative;overflow:hidden;isolation:isolate;width:100%;height:clamp(158px,47vw,188px);border-radius:11px;background:radial-gradient(ellipse at 25% 20%,#27866d 0%,#176b58 50%,#115443 100%);box-shadow:inset 0 0 0 3px #0c5142,0 3px 9px #143c3033}
         .badminton-court:before{content:'';position:absolute;inset:0;background:linear-gradient(115deg,#ffffff0b,transparent 58%);pointer-events:none}
         .court-markings,.court-markings span{position:absolute;pointer-events:none}
         .court-markings{inset:0;z-index:1}
@@ -106,19 +106,15 @@
         .court-center-left{left:9px;width:calc(34% - 9px)}
         .court-center-right{right:9px;width:calc(34% - 9px)}
         .court-net{left:50%;top:0;bottom:0;width:7px;transform:translateX(-50%);border-left:2px solid #f6fff1;border-right:1px solid #caffed77;background:repeating-linear-gradient(0deg,#e9fff2a8 0 1px,#ffffff16 1px 7px);box-shadow:2px 0 4px #0b292549;z-index:2}
-        .court-side{position:absolute;z-index:2;top:13px;transform:translateX(-50%);font-size:9px;letter-spacing:1.5px;font-weight:850;color:#e5fff0bf;pointer-events:none}
+        .court-side{position:absolute;z-index:2;top:9px;transform:translateX(-50%);font-size:9px;letter-spacing:1.5px;font-weight:850;color:#e5fff0bf;pointer-events:none}
         .court-side-a{left:75%}.court-side-b{left:25%}
-        .court-slots{position:absolute;z-index:3;inset:31px 17px 11px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));align-items:center;justify-items:center;gap:12px 6px}
-        .court-slot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:100%;max-width:130px;min-width:0;min-height:69px;padding:5px 4px;border-radius:10px;line-height:1.1;text-align:center;touch-action:manipulation}
+        .court-slots{position:absolute;z-index:3;inset:23px 16px 9px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));align-items:center;justify-items:center;gap:7px 6px}
+        .court-slot{display:flex;align-items:center;justify-content:center;width:100%;max-width:130px;min-width:0;min-height:46px;padding:7px 6px;border-radius:9px;line-height:1.2;text-align:center;touch-action:manipulation}
         .court-slot.filled{border:1px solid #eaffef;background:#f6fffaf3;box-shadow:0 2px 8px #082c253a;color:#1a5647}
         .court-slot.empty{border:1.5px dashed #e5fff0bd;background:#073d3282;color:#ecfff2}
         .court-slot:focus-visible{outline:3px solid #fff;outline-offset:3px}
-        .court-avatar{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#b7eee0;color:#12614c;font-size:11px;font-weight:850}
-        .court-name{display:block;max-width:100%;font-size:11px;line-height:1.15;color:#165744;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .court-count{font-size:9px;color:#3f7666}
-        .court-empty-plus{font-size:18px;line-height:1;font-weight:600}
-        .court-empty-label{font-size:11px;font-weight:750}
-        .court-slot.empty small{font-size:9px;color:#d1f1e6}
+        .court-name{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;max-width:100%;font-size:12px;line-height:1.2;font-weight:750;color:#165744;overflow:hidden;overflow-wrap:anywhere}
+        .court-empty-plus{font-size:23px;line-height:1;font-weight:600}
         .set-suggest{display:block;width:100%;min-height:43px;margin-top:8px;background:#e8f1ff;color:#1254ae;border:1px solid #c3dafb;border-radius:9px;font-size:12px;font-weight:750}
         .set-list-title{margin:12px 2px 7px}
         .set-players{display:grid;gap:5px}
@@ -139,12 +135,12 @@
         .set-action-count strong{font-size:14px;color:#175da8}
         .set-action button{min-height:45px;flex:1;max-width:245px;font-size:12px}
         @media(max-width:350px){
-          .badminton-court{height:214px}.court-slots{inset:26px 11px 8px;gap:8px 5px}
-          .court-slot{min-height:64px;max-width:116px;padding:4px 3px}.court-name{font-size:10px}
+          .badminton-court{height:155px}.court-slots{inset:21px 11px 7px;gap:5px}
+          .court-slot{min-height:44px;max-width:116px;padding:5px 3px}.court-name{font-size:11px}
           .set-top .section-title{font-size:17px}.set-player{gap:6px;padding:5px 7px}.set-avatar{flex-basis:28px;height:28px}
         }
         @media(min-width:560px){
-          #sets{max-width:680px;margin:auto}.badminton-court{max-width:395px;height:282px;margin:auto}
+          #sets{max-width:680px;margin:auto}.badminton-court{max-width:395px;height:196px;margin:auto}
           .set-player{min-height:55px}.set-action{padding-left:max(10px,calc((100vw - 670px)/2));padding-right:max(10px,calc((100vw - 670px)/2))}
         }
 
@@ -228,16 +224,12 @@
         const id=[...selected][index],p=id&&state.players.find(player=>player.id===id);
         if(p){
           const shortName=p.name.trim().split(/\s+/).slice(-2).join(' ');
-          return `<button class="court-slot filled" type="button" data-remove="${escapeHTML(p.id)}" aria-label="Bỏ chọn ${escapeHTML(p.name)} khỏi đội ${side}">
-            <span class="court-avatar" aria-hidden="true">${escapeHTML(p.name.trim().charAt(0).toUpperCase()||'?')}</span>
+          return `<button class="court-slot filled" type="button" data-remove="${escapeHTML(p.id)}" aria-label="Bỏ chọn ${escapeHTML(p.name)} khỏi đội ${side}" title="${escapeHTML(p.name)}">
             <strong class="court-name">${escapeHTML(shortName)}</strong>
-            <small class="court-count">${p.sets} set <span aria-hidden="true">· ×</span></small>
           </button>`;
         }
         return `<button class="court-slot empty" type="button" data-choose="${index}" aria-label="Chọn người cho đội ${side}, vị trí ${teamPosition}">
           <span class="court-empty-plus" aria-hidden="true">+</span>
-          <span class="court-empty-label">Đội ${side} · ${teamPosition}</span>
-          <small>Chọn người</small>
         </button>`;
       }).join('');
       $('setPlayers').querySelectorAll('.set-player').forEach(row=>{
