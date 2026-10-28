@@ -83,9 +83,8 @@
     
         /* Compact, thumb-friendly set planner for narrow phone screens. */
         #sets{padding-bottom:108px}
-        .set-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:1px 1px 8px}
-        .set-top .section-title{font-size:18px;margin:0 0 2px;line-height:1.25}
-        .set-top .hint{font-size:11px;line-height:1.2;margin:0}
+        .set-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 1px 6px}
+        .set-top .section-title{font-size:16px;margin:0;line-height:1.2}
         .set-available{white-space:nowrap;background:#dcebf9;color:#195d9c;border-radius:99px;padding:6px 8px;font-size:11px;font-weight:750}
         .set-selection{background:#fff;border:1px solid var(--line);border-radius:13px;padding:9px;box-shadow:0 2px 8px #163b5b08}
         .set-section-line{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
@@ -146,10 +145,10 @@
 
     
         /* Compact top navigation: replace the old blue title header and bottom tab bar. */
-        .top-nav{position:sticky;top:0;z-index:20;background:#ffffff;border-bottom:1px solid var(--line);box-shadow:0 2px 9px #132b4410;padding:5px 8px}
-        .top-nav .wrap{display:flex;gap:6px;max-width:680px;margin:auto}
-        .top-nav button{flex:1;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;min-width:0;min-height:46px;padding:7px 4px;border-radius:10px;background:transparent;color:#6b7f93;font-size:12px;font-weight:750;white-space:nowrap}
-        .top-nav button b{font-size:18px;font-weight:600;line-height:1}
+        .top-nav{position:sticky;top:0;z-index:20;background:#ffffff;border-bottom:1px solid var(--line);box-shadow:0 2px 7px #132b440c;padding:3px 8px}
+        .top-nav .wrap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;max-width:680px;margin:auto}
+        .top-nav button{display:grid;place-items:center;min-width:0;min-height:44px;height:44px;padding:0;border-radius:9px;background:transparent;color:#6b7f93}
+        .top-nav button svg{display:block;width:21px;height:21px}
         .top-nav button.active{color:#1256ad;background:#e8f1ff}
         .top-nav button:focus-visible{outline:2px solid #1763db;outline-offset:1px}
         main{padding-top:8px;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
@@ -160,16 +159,20 @@
         .settings-date input{font-size:16px;min-height:46px;color:#20374b;background:#fff}
         #sets{padding-bottom:83px}
         .set-action{bottom:calc(0px + env(safe-area-inset-bottom,0px))}
-        @media(max-width:350px){.top-nav{padding:4px 6px}.top-nav .wrap{gap:3px}.top-nav button{font-size:11px;gap:4px;padding:5px 2px}.top-nav button b{font-size:17px}}
+        @media(max-width:350px){.top-nav{padding:2px 6px}.top-nav .wrap{gap:4px}.top-nav button{min-height:44px}}
 
     </style>
 </head>
 <body>
-<nav class="top-nav" aria-label="Điều hướng chính"><div class="wrap"><button data-page="home" class="active" aria-current="page"><b aria-hidden="true">⌂</b>Trang chủ</button><button data-page="sets"><b aria-hidden="true">▦</b>Xếp set</button><button data-page="settings"><b aria-hidden="true">⚙</b>Cài đặt</button></div></nav>
+<nav class="top-nav" aria-label="Điều hướng chính"><div class="wrap">
+  <button type="button" data-page="home" class="active" aria-label="Trang chủ" title="Trang chủ" aria-current="page"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M9 20v-7h6v7"/></svg></button>
+  <button type="button" data-page="sets" aria-label="Xếp set" title="Xếp set"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 20v-2a5.5 5.5 0 0 1 11 0v2"/><circle cx="17.5" cy="8.5" r="2.5"/><path d="M17 14.5a4.5 4.5 0 0 1 4 4.5v1"/></svg></button>
+  <button type="button" data-page="settings" aria-label="Cài đặt" title="Cài đặt"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 14 5l2.5-.5 1 2.5L20 8l-.5 2.5L21 12l-1.5 2.5L20 17l-2.5 1-1 2.5L14 20l-2 1.5L10 20l-2.5.5-1-2.5L4 17l.5-2.5L3 12l1.5-2.5L4 8l2.5-1 1-2.5L10 5Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+</div></nav>
 <div id="storageWarning" class="storage-warning" role="status" hidden>Không thể lưu trên thiết bị này. Dữ liệu hiện chỉ giữ trong lần mở này.</div>
 <main class="wrap"><section id="home"><div class="tabs home-filters" aria-label="Lọc người chơi"><button data-filter="all" class="active"></button><button data-filter="playing"></button><button data-filter="done"></button></div><button id="addPlayer" class="primary add">＋ Thêm người chơi</button><div class="home-shuttles"><label for="shuttleCount">🏸 Cầu đã dùng</label><div class="shuttle-counter"><button id="shuttleMinus" aria-label="Giảm 1 quả cầu">−</button><input id="shuttleCount" type="number" inputmode="numeric" min="0" max="99999" step="1" value="0"><button id="shuttlePlus" class="primary" aria-label="Thêm 1 quả cầu">+1 quả</button></div></div><p id="shuttleError" class="hint" role="alert" hidden></p><div id="players"></div><h2 class="section-title" style="margin-top:16px">Thống kê tiền cả buổi</h2><div class="summary" aria-live="polite"><div>Tổng tiền<strong id="grandTotal"></strong></div><div style="color:#197342">Tiền mặt<strong id="cashTotal"></strong></div><div style="color:#215baf">Chuyển khoản<strong id="transferTotal"></strong></div><div class="unpaid">Chưa thu<strong id="unpaidTotal"></strong></div></div><p class="hint">Tổng tiền = Tiền mặt + Chuyển khoản + Chưa thu. Bao gồm số tiền và nợ nước của tất cả người chơi.</p><div class="summary water-summary" aria-live="polite"><div>Tổng thu (đã nhận)<strong id="receivedTotal"></strong></div><div>Tiền nước cả buổi<strong id="waterTotal"></strong></div><div>Nước đã thu<strong id="waterPaid"></strong></div><div>Nước chưa thu<strong id="waterUnpaid"></strong></div><div style="grid-column:1/-1;color:#197342">Tổng host<strong id="hostTotal"></strong><small>Tổng thu − nước đã thu</small></div></div><div class="shuttle-cost" aria-live="polite"><div><span>Tiền cầu</span><small id="shuttleUsed">0 quả</small></div><strong id="shuttleTotal">0đ</strong></div><p id="shuttleFormula" class="hint"></p><p class="session-note">Bản demo · Dữ liệu lưu trên thiết bị</p></section><section id="sets" hidden>
   <div class="set-top">
-    <div><h2 class="section-title">🏸 Xếp set</h2><p class="hint">Chọn 4 người · 2 đấu 2</p></div>
+    <h2 class="section-title">🏸 Xếp set</h2>
     <span class="set-available" id="setAvailable">0 đang chơi</span>
   </div>
   <div class="set-selection">
