@@ -189,7 +189,7 @@ class MainActivity : ComponentActivity() {
 
     inner class CloudBridge {
         @JavascriptInterface
-        fun connect(date: String, payload: String) {
+        fun connect(date: String, payload: String, createIfMissing: Boolean) {
             val user = firebaseAuth?.currentUser
             val db = firebaseDb
             if (user == null || db == null) {
@@ -245,7 +245,7 @@ class MainActivity : ComponentActivity() {
                                 group.getString("area") ?: "",
                                 group.getBoolean("isPublic") ?: false
                             )
-                            connectSession(db, groupId, date, payload)
+                            connectSession(db, groupId, date, payload, createIfMissing)
                         }
                         .addOnFailureListener { sendCloudFailure(it) }
                 }
@@ -353,7 +353,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun connectSession(db: FirebaseFirestore, groupId: String, date: String, localPayload: String) {
+    private fun connectSession(
+        db: FirebaseFirestore,
+        groupId: String,
+        date: String,
+        localPayload: String,
+        createIfMissing: Boolean
+    ) {
         sessionRegistration?.remove()
         sessionRegistration = null
         connectedSessionDate = date
@@ -374,7 +380,8 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     attachSessionListener(ref, date)
-                } else {
+                } else if (createIfMissing) {
+                    // Only an explicit "create session" action may seed a cloud document.
                     ref.set(
                         mapOf(
                             "date" to date,
@@ -390,6 +397,10 @@ class MainActivity : ComponentActivity() {
                             attachSessionListener(ref, date)
                         }
                         .addOnFailureListener { sendCloudFailure(it) }
+                } else {
+                    // Normal connection is read-only, so cached data cannot cross accounts.
+                    sendCloudStatus(true, "Chưa có dữ liệu trên cloud")
+                    attachSessionListener(ref, date)
                 }
             }
             .addOnFailureListener { sendCloudFailure(it) }

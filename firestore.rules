@@ -6,14 +6,34 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function groupExists(groupId) {
+      return exists(/databases/$(database)/documents/groups/$(groupId));
+    }
+
     function isOwner(groupId) {
       return signedIn() &&
+        groupExists(groupId) &&
         get(/databases/$(database)/documents/groups/$(groupId)).data.ownerUid == request.auth.uid;
     }
 
     function isMember(groupId) {
       return signedIn() &&
         exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid));
+    }
+
+    function validSession(sessionId) {
+      return request.resource.data.keys().hasAll([
+          'date', 'payload', 'creatorUid', 'updatedBy', 'updatedAt'
+        ]) &&
+        request.resource.data.keys().hasOnly([
+          'date', 'payload', 'creatorUid', 'updatedBy', 'createdAt', 'updatedAt'
+        ]) &&
+        request.resource.data.date is string &&
+        request.resource.data.date == sessionId &&
+        request.resource.data.payload is string &&
+        request.resource.data.payload.size() <= 750000 &&
+        request.resource.data.creatorUid == request.auth.uid &&
+        request.resource.data.updatedBy == request.auth.uid;
     }
 
     match /users/{userId} {
@@ -31,7 +51,9 @@ service cloud.firestore {
       allow create: if signedIn() &&
         request.auth.uid == groupId &&
         request.resource.data.ownerUid == request.auth.uid;
-      allow update, delete: if isOwner(groupId);
+      allow update: if isOwner(groupId) &&
+        request.resource.data.ownerUid == resource.data.ownerUid;
+      allow delete: if isOwner(groupId);
 
       match /members/{memberId} {
         allow read: if signedIn() &&
@@ -48,18 +70,28 @@ service cloud.firestore {
       match /sessions/{sessionId} {
         allow read: if isOwner(groupId) || isMember(groupId);
         allow create: if isOwner(groupId) &&
-          request.resource.data.creatorUid == request.auth.uid;
+          validSession(sessionId);
         allow update: if isOwner(groupId) &&
-          (!('creatorUid' in resource.data) || resource.data.creatorUid == request.auth.uid) &&
-          request.resource.data.creatorUid == request.auth.uid;
+          (!('creatorUid' in resource.data) ||
+            resource.data.creatorUid == request.auth.uid) &&
+          request.resource.data.creatorUid == request.auth.uid &&
+          validSession(sessionId);
         allow delete: if isOwner(groupId) &&
-          (!('creatorUid' in resource.data) || resource.data.creatorUid == request.auth.uid);
+          (!('creatorUid' in resource.data) ||
+            resource.data.creatorUid == request.auth.uid);
       }
 
       match /joinRequests/{userId} {
         allow create: if signedIn() &&
+          groupExists(groupId) &&
+          get(/databases/$(database)/documents/groups/$(groupId)).data.isPublic == true &&
           request.auth.uid == userId &&
-          request.resource.data.userId == request.auth.uid;
+          request.resource.data.keys().hasOnly([
+            'userId', 'status', 'createdAt'
+          ]) &&
+          request.resource.data.userId == request.auth.uid &&
+          request.resource.data.status == 'pending' &&
+          request.resource.data.createdAt == request.time;
         allow read: if signedIn() &&
           (request.auth.uid == userId || isOwner(groupId));
         allow update, delete: if isOwner(groupId);
@@ -68,9 +100,24 @@ service cloud.firestore {
       match /messages/{messageId} {
         allow read: if isOwner(groupId) || isMember(groupId);
         allow create: if (isOwner(groupId) || isMember(groupId)) &&
-          request.resource.data.senderUid == request.auth.uid;
-        allow update, delete: if signedIn() &&
-          resource.data.senderUid == request.auth.uid;
+          request.resource.data.keys().hasOnly([
+            'senderUid', 'text', 'createdAt'
+          ]) &&
+          request.resource.data.senderUid == request.auth.uid &&
+          request.resource.data.text is string &&
+          request.resource.data.text.size() > 0 &&
+          request.resource.data.text.size() <= 2000 &&
+          request.resource.data.createdAt == request.time;
+        allow update: if signedIn() &&
+          resource.data.senderUid == request.auth.uid &&
+          request.resource.data.senderUid == resource.data.senderUid &&
+          request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['text', 'updatedAt']) &&
+          request.resource.data.text is string &&
+          request.resource.data.text.size() > 0 &&
+          request.resource.data.text.size() <= 2000;
+        allow delete: if signedIn() &&
+          (resource.data.senderUid == request.auth.uid || isOwner(groupId));
       }
     }
 

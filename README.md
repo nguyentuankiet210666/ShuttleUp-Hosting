@@ -33,11 +33,11 @@
 
 - **Kotlin**: ứng dụng Android và WebView.
 - **HTML/CSS/JavaScript**: giao diện trong `app/src/main/assets/index.html`.
-- **localStorage**: bộ nhớ cục bộ và cache khi ngoại tuyến.
+- **localStorage**: cache ngoại tuyến được tách riêng theo Firebase UID; dữ liệu phiên cũ chỉ được nhập vào tài khoản sau khi người dùng xác nhận.
 - **Firebase Authentication**: tạo tài khoản và đăng nhập bằng email/mật khẩu.
 - **Cloud Firestore**: đồng bộ hồ sơ nhóm, thành viên và các buổi chơi theo ngày.
 
-**Lưu ý dữ liệu:** Ảnh biên lai chỉ lưu trên điện thoại để tránh làm tài liệu Firestore quá lớn; các dữ liệu còn lại của buổi chơi được đồng bộ.
+**Lưu ý dữ liệu:** Ảnh biên lai chỉ lưu trên điện thoại, được nén và giới hạn kích thước trước khi ghi để tránh làm đầy bộ nhớ; ảnh không được tải lên Firestore. Dữ liệu buổi chơi còn lại được đồng bộ theo tài khoản.
 
 ## ▶️ Cài đặt và chạy
 
