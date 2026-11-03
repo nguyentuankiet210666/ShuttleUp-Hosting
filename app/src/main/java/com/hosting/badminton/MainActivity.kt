@@ -266,12 +266,36 @@ class MainActivity : ComponentActivity() {
                     mapOf(
                         "date" to date,
                         "payload" to payload,
+                        "creatorUid" to user.uid,
                         "updatedBy" to user.uid,
                         "updatedAt" to FieldValue.serverTimestamp()
                     ),
                     SetOptions.merge()
                 )
                 .addOnSuccessListener { sendCloudStatus(true, "Đã đồng bộ") }
+                .addOnFailureListener { sendCloudFailure(it) }
+        }
+
+        @JavascriptInterface
+        fun deleteSession(date: String) {
+            val user = firebaseAuth?.currentUser
+            val db = firebaseDb
+            if (user == null || db == null) {
+                sendCloudError("Bạn cần đăng nhập để xóa buổi chơi.")
+                return
+            }
+            if (!Regex("^\\d{4}-\\d{2}-\\d{2}$").matches(date)) {
+                sendCloudError("Ngày buổi chơi không hợp lệ.")
+                return
+            }
+            if (connectedSessionDate == date) {
+                sessionRegistration?.remove()
+                sessionRegistration = null
+                connectedSessionDate = null
+            }
+            db.collection("groups").document(user.uid).collection("sessions").document(date)
+                .delete()
+                .addOnSuccessListener { sendCloudStatus(true, "Đã xóa buổi chơi") }
                 .addOnFailureListener { sendCloudFailure(it) }
         }
 
@@ -339,12 +363,23 @@ class MainActivity : ComponentActivity() {
                 if (connectedSessionDate != date) return@addOnSuccessListener
                 if (document.exists()) {
                     document.getString("payload")?.let { sendCloudSession(date, it) }
+                    if (!document.contains("creatorUid")) {
+                        ref.set(
+                            mapOf(
+                                "creatorUid" to groupId,
+                                "updatedBy" to groupId,
+                                "updatedAt" to FieldValue.serverTimestamp()
+                            ),
+                            SetOptions.merge()
+                        )
+                    }
                     attachSessionListener(ref, date)
                 } else {
                     ref.set(
                         mapOf(
                             "date" to date,
                             "payload" to localPayload,
+                            "creatorUid" to groupId,
                             "updatedBy" to groupId,
                             "createdAt" to FieldValue.serverTimestamp(),
                             "updatedAt" to FieldValue.serverTimestamp()
@@ -623,4 +658,3 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
     }
 }
-

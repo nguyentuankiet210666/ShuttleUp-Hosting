@@ -46,8 +46,14 @@ service cloud.firestore {
       }
 
       match /sessions/{sessionId} {
-        allow read, create, update, delete:
-          if isOwner(groupId) || isMember(groupId);
+        allow read: if isOwner(groupId) || isMember(groupId);
+        allow create: if isOwner(groupId) &&
+          request.resource.data.creatorUid == request.auth.uid;
+        allow update: if isOwner(groupId) &&
+          (!('creatorUid' in resource.data) || resource.data.creatorUid == request.auth.uid) &&
+          request.resource.data.creatorUid == request.auth.uid;
+        allow delete: if isOwner(groupId) &&
+          (!('creatorUid' in resource.data) || resource.data.creatorUid == request.auth.uid);
       }
 
       match /joinRequests/{userId} {
@@ -73,4 +79,3 @@ service cloud.firestore {
     }
   }
 }
-
