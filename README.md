@@ -17,6 +17,7 @@
 | 👤 Tài khoản | Tạo tài khoản, đăng nhập, xác minh email và đăng xuất |
 | ☁️ Đồng bộ | Đồng bộ nhóm và từng buổi chơi giữa các thiết bị đăng nhập cùng tài khoản |
 | 📍 Nhóm khu vực | Đặt tên, khu vực và trạng thái công khai cho nhóm |
+| 🧭 Giao diện cộng đồng | Khám phá nhóm, chi tiết nhóm, lịch chơi, trao đổi và hồ sơ cá nhân |
 
 ## 📱 Giao diện và demo
 
@@ -65,6 +66,7 @@ Xem hướng dẫn chi tiết tại [FIREBASE_SETUP.md](FIREBASE_SETUP.md). Dữ
 - [x] Đồng bộ Firestore với phân quyền theo nhóm
 - [x] Lịch sử nhiều buổi chơi theo ngày
 - [x] Hồ sơ nhóm, khu vực và trạng thái công khai
+- [x] Giao diện cộng đồng ưu tiên điện thoại
 - [ ] Hoàn thiện giao diện xếp set tối ưu cho điện thoại
 - [ ] Khám phá và tìm nhóm công khai theo khu vực
 - [ ] Gửi yêu cầu tham gia và quản lý thành viên
