@@ -161,6 +161,7 @@
         .set-action{bottom:calc(0px + env(safe-area-inset-bottom,0px))}
         @media(max-width:350px){.top-nav{padding:2px 6px}.top-nav .wrap{gap:4px}.top-nav button{min-height:44px}}
         .auth-card{margin-bottom:10px}.auth-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.auth-head h2{margin:0}.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}.auth-tabs button{min-height:42px;border:1px solid var(--line);background:#f5f8fb;color:#526c82}.auth-tabs button.active{border-color:#8db8f2;background:#e8f1ff;color:#1256ad}.auth-form{display:grid;gap:10px}.auth-form label{display:grid;gap:5px;color:#526c82;font-size:12px;font-weight:650}.auth-form input{font-size:16px}.auth-message{border-radius:9px;padding:9px 10px;font-size:12px;line-height:1.45;background:#edf4ff;color:#215baf}.auth-message.error{background:#fff0ee;color:#a32920}.auth-message.success{background:#edf9f1;color:#197342}.account-box{display:flex;align-items:center;gap:10px}.account-avatar{display:grid;place-items:center;flex:0 0 42px;height:42px;border-radius:50%;background:#e8f1ff;color:#1256ad;font-weight:800;font-size:18px}.account-info{min-width:0;flex:1}.account-info strong,.account-info span{display:block;overflow-wrap:anywhere}.account-info span{margin-top:2px;color:#65788a;font-size:12px}.account-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.auth-loading{opacity:.65;pointer-events:none}
+        .cloud-card{margin-bottom:10px}.cloud-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.cloud-head h2{margin:0}.sync-status{font-size:11px;font-weight:750;color:#65788a}.sync-status.syncing{color:#95600c}.sync-status.synced{color:#197342}.sync-status.error{color:#b42318}.group-form{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.group-form input{font-size:15px}.group-form button{white-space:nowrap}.cloud-detail{margin:9px 0 0;color:#65788a;font-size:11px;line-height:1.45}
 
     </style>
 </head>
@@ -217,7 +218,7 @@
         <label id="authConfirmField" hidden>Nhập lại mật khẩu<input id="authConfirm" type="password" minlength="6" maxlength="128" autocomplete="new-password"></label>
         <button id="authSubmit" class="primary wide" type="submit">Đăng nhập</button>
       </form>
-      <p class="hint">Tài khoản dùng để đồng bộ nhóm và buổi chơi ở các bước phát triển tiếp theo.</p>
+      <p class="hint">Đăng nhập để tự động đồng bộ nhóm và các buổi chơi giữa nhiều thiết bị.</p>
     </div>
     <div id="authUser" hidden>
       <div class="account-box"><span id="accountAvatar" class="account-avatar">H</span><div class="account-info"><strong id="accountName">Người dùng</strong><span id="accountEmail"></span></div></div>
@@ -226,7 +227,14 @@
     </div>
     <p id="authMessage" class="auth-message" role="status" hidden></p>
   </div>
-  <div class="card"><h2 class="section-title">Cài đặt buổi chơi</h2><p class="hint">Thay đổi được lưu tự động trên thiết bị.</p><label class="settings-date">Ngày buổi chơi<input id="sessionDate" type="date" aria-label="Ngày buổi chơi"></label><p class="hint">Ngày này là nhãn của buổi chơi hiện tại, chưa tạo lịch sử buổi riêng.</p><label for="shuttlePrice" class="label">Đơn giá mỗi quả cầu (đồng)</label><input id="shuttlePrice" type="number" inputmode="numeric" min="0" max="999999999" step="1" value="0"><p id="shuttlePriceError" class="hint" role="alert" hidden></p><p class="hint">Tự tính tiền cầu ở Trang chủ. Tiền cầu được thống kê riêng.</p><button id="sheets" class="wide">Google Sheets · Chưa kết nối</button></div>
+  <div id="cloudCard" class="card cloud-card" hidden>
+    <div class="cloud-head"><h2 class="section-title">Nhóm & đồng bộ</h2><span id="syncStatus" class="sync-status">Chưa kết nối</span></div>
+    <div class="group-form"><input id="groupName" maxlength="70" aria-label="Tên nhóm cầu lông" placeholder="Tên nhóm cầu lông"><button id="saveGroupName" type="button">Lưu nhóm</button></div>
+    <label class="settings-date">Khu vực hoạt động<input id="groupArea" maxlength="80" placeholder="Ví dụ: Quận 7, TP.HCM"></label>
+    <label class="choose" style="min-height:44px"><input id="groupPublic" type="checkbox"><span>Cho phép cộng đồng tìm thấy nhóm</span></label>
+    <p class="cloud-detail">Mỗi ngày là một buổi riêng. Người chơi, số set, tiền, nước và số cầu được đồng bộ. Ảnh chuyển khoản chỉ giữ trên điện thoại.</p>
+  </div>
+  <div class="card"><h2 class="section-title">Cài đặt buổi chơi</h2><p class="hint">Thay đổi được lưu trên thiết bị và đồng bộ khi đã đăng nhập.</p><label class="settings-date">Ngày buổi chơi<input id="sessionDate" type="date" aria-label="Ngày buổi chơi"></label><p class="hint">Đổi ngày để mở hoặc tạo một buổi chơi khác.</p><label for="shuttlePrice" class="label">Đơn giá mỗi quả cầu (đồng)</label><input id="shuttlePrice" type="number" inputmode="numeric" min="0" max="999999999" step="1" value="0"><p id="shuttlePriceError" class="hint" role="alert" hidden></p><p class="hint">Tự tính tiền cầu ở Trang chủ. Tiền cầu được thống kê riêng.</p><button id="sheets" class="wide">Google Sheets · Chưa kết nối</button></div>
 </section></main>
 
 <div id="paymentOverlay" class="overlay" hidden><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="paymentTitle" tabindex="-1"><div class="handle"></div><div class="sheet-head"><h2 id="paymentTitle">Check thanh toán</h2><button class="close" data-close aria-label="Đóng">×</button></div><div class="payment-info"><span id="paymentName"></span><strong id="paymentAmount"></strong></div><input id="receiptCamera" type="file" accept="image/*" capture="environment" hidden><input id="receiptGallery" type="file" accept="image/*" hidden><div id="receiptSources" hidden><p class="hint">Chọn ảnh chuyển khoản</p><div class="receipt-sources"><button id="takeReceipt">Chụp ảnh</button><button id="pickReceipt">Chọn từ Thư viện</button></div></div><div id="receiptArea" hidden><img id="receiptPreview" alt="Ảnh chuyển khoản" style="display:block;width:100%;max-height:240px;object-fit:contain;border-radius:8px;margin:8px 0"><button id="confirmReceipt" class="primary wide" hidden>Lưu ảnh và xác nhận chuyển khoản</button><p class="hint">Ảnh chỉ được gắn với người chơi khi bấm xác nhận. Ảnh chụp mới sẽ lưu vào Pictures/Hosting; ảnh chọn từ Thư viện không tạo bản trùng.</p></div><div class="pay-buttons"><button class="cash" data-pay="cash">Tiền mặt</button><button class="transfer" data-pay="transfer">Chuyển khoản</button><button class="unpaid" data-pay="unpaid">Chưa thanh toán</button></div></section></div>
@@ -234,16 +242,76 @@
 <div id="toast" class="toast" role="status" hidden></div>
 <script>
     'use strict';
-    const $=id=>document.getElementById(id), KEY='hosting.mobile.demo.v1', statuses={cash:'Tiền mặt',transfer:'Chuyển khoản',unpaid:'Chưa thanh toán'};
+    const $=id=>document.getElementById(id), KEY='hosting.mobile.demo.v1', SESSIONS_KEY='hosting.mobile.sessions.v2', statuses={cash:'Tiền mặt',transfer:'Chuyển khoản',unpaid:'Chưa thanh toán'};
     const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
-    const seed=()=>({date:today(),players:[{id:'p1',name:'Nguyễn Văn An',start:'18:00',end:'21:00',sets:11,money:70000,water:10000,payment:'unpaid'},{id:'p2',name:'Trần Minh Bình',start:'18:30',end:'21:00',sets:7,money:90000,water:0,payment:'unpaid'},{id:'p3',name:'Lê Hoàng Huy',start:'19:00',end:'',sets:4,money:60000,water:5000,payment:'unpaid'},{id:'p4',name:'Phạm Gia Bảo',start:'18:00',end:'',sets:5,money:70000,water:0,payment:'unpaid'},{id:'p5',name:'Nguyễn Minh Khang',start:'18:30',end:'',sets:3,money:60000,water:10000,payment:'unpaid'}]});
-    let state=seed(),filter='all',selected=new Set(),paymentId=null,editId=null,activeOverlay=null,returnFocus=null,toastTimer;
-    try{const raw=localStorage.getItem(KEY);if(raw){const parsed=JSON.parse(raw);if(!parsed||!Array.isArray(parsed.players)||!/^\d{4}-\d{2}-\d{2}$/.test(parsed.date)||!parsed.players.every(p=>p&&typeof p.id==='string'&&typeof p.name==='string'&&typeof p.start==='string'&&typeof p.end==='string'&&[p.sets,p.money,p.water].every(n=>Number.isSafeInteger(n)&&n>=0)&&Object.hasOwn(statuses,p.payment)))throw Error('Invalid data');state=parsed}}catch(e){$('storageWarning').hidden=false}
+    const emptySession=(date=today(),price=0)=>({date,players:[],shuttles:{count:0,price}});
+    const seed=()=>emptySession();
+    const validState=value=>value&&Array.isArray(value.players)&&/^\d{4}-\d{2}-\d{2}$/.test(value.date)&&value.players.every(p=>p&&typeof p.id==='string'&&typeof p.name==='string'&&typeof p.start==='string'&&typeof p.end==='string'&&[p.sets,p.money,p.water].every(n=>Number.isSafeInteger(n)&&n>=0)&&Object.hasOwn(statuses,p.payment));
+    const clone=value=>JSON.parse(JSON.stringify(value));
+    let state=seed(),sessions={},filter='all',selected=new Set(),paymentId=null,editId=null,activeOverlay=null,returnFocus=null,toastTimer;
+    try{
+      const history=JSON.parse(localStorage.getItem(SESSIONS_KEY)||'null');
+      if(history&&history.sessions&&typeof history.sessions==='object'){
+        Object.entries(history.sessions).forEach(([date,value])=>{if(validState(value))sessions[date]=value});
+        if(sessions[history.activeDate])state=sessions[history.activeDate];
+      }else{
+        const legacy=JSON.parse(localStorage.getItem(KEY)||'null');
+        if(validState(legacy))state=legacy;
+      }
+      sessions[state.date]=state;
+    }catch(e){$('storageWarning').hidden=false}
     const escapeHTML=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const money=n=>n.toLocaleString('vi-VN')+'đ',total=p=>p.money+p.water;
-    function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){$('storageWarning').hidden=false}}
+    function persistLocal(){
+      sessions[state.date]=state;
+      localStorage.setItem(KEY,JSON.stringify(state));
+      localStorage.setItem(SESSIONS_KEY,JSON.stringify({activeDate:state.date,sessions}));
+    }
+    function save(){try{persistLocal();scheduleCloudSync()}catch(e){$('storageWarning').hidden=false}}
     function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,2500)}
-    let authMode='login',authBusy=false;
+    let authMode='login',authBusy=false,currentUser=null,cloudTimer=null,applyingCloud=false;
+    function setSyncStatus(message,type=''){
+      $('syncStatus').textContent=message;$('syncStatus').className='sync-status'+(type?' '+type:'');
+    }
+    function cloudPayload(){
+      const safe=clone(state);
+      safe.players.forEach(player=>delete player.receipt);
+      return JSON.stringify(safe);
+    }
+    function connectCloud(){
+      const bridge=window.HostingCloudNative;
+      if(!currentUser||!bridge)return;
+      clearTimeout(cloudTimer);setSyncStatus('Đang kết nối…','syncing');
+      bridge.connect(state.date,cloudPayload());
+    }
+    function scheduleCloudSync(){
+      if(applyingCloud||!currentUser||!window.HostingCloudNative)return;
+      clearTimeout(cloudTimer);setSyncStatus('Đang lưu…','syncing');
+      cloudTimer=setTimeout(()=>window.HostingCloudNative.saveSession(state.date,cloudPayload()),650);
+    }
+    window.HostingCloud={
+      handleResult(payload){
+        let result;try{result=typeof payload==='string'?JSON.parse(payload):payload}catch(e){return}
+        if(result.type==='group'){
+          $('groupName').value=result.name||'';$('groupArea').value=result.area||'';
+          $('groupPublic').checked=Boolean(result.isPublic);$('cloudCard').hidden=false;
+        }else if(result.type==='session'&&result.payload){
+          try{
+            const remote=JSON.parse(result.payload);
+            if(!validState(remote)||remote.date!==result.date)return;
+            const receipts=new Map((state.players||[]).filter(p=>p.receipt).map(p=>[p.id,p.receipt]));
+            remote.players.forEach(p=>{if(receipts.has(p.id))p.receipt=receipts.get(p.id)});
+            if(!remote.shuttles)remote.shuttles={count:0,price:0};
+            applyingCloud=true;state=remote;sessions[state.date]=state;persistLocal();selected.clear();renderShuttles();render();applyingCloud=false;
+            setSyncStatus('Đã đồng bộ','synced');
+          }catch(e){setSyncStatus('Dữ liệu lỗi','error')}
+        }else if(result.type==='status'){
+          setSyncStatus(result.message||'Đã đồng bộ',result.ok?'synced':'error');
+        }else if(result.type==='error'){
+          setSyncStatus(result.message||'Lỗi đồng bộ','error');
+        }
+      }
+    };
     function setAuthMode(mode){
       authMode=mode;const register=mode==='register';
       $('loginTab').classList.toggle('active',!register);$('registerTab').classList.toggle('active',register);
@@ -264,13 +332,20 @@
     }
     function renderAuth(user){
       const signedIn=Boolean(user&&user.uid);
+      currentUser=signedIn?user:null;
       $('authGuest').hidden=signedIn;$('authUser').hidden=!signedIn;
       $('authBadge').textContent=signedIn?'Đã đăng nhập':'Chưa đăng nhập';
-      if(!signedIn)return;
+      $('cloudCard').hidden=!signedIn;
+      if(!signedIn){
+        clearTimeout(cloudTimer);setSyncStatus('Chưa kết nối');
+        if(window.HostingCloudNative)window.HostingCloudNative.disconnect();
+        return;
+      }
       const name=(user.name||'').trim()||'Người chơi';
       $('accountName').textContent=name;$('accountEmail').textContent=user.email||'';
       $('accountAvatar').textContent=(name.charAt(0)||'H').toUpperCase();
       $('verificationNote').hidden=Boolean(user.verified);$('verifyEmail').hidden=Boolean(user.verified);
+      connectCloud();
     }
     window.HostingAuth={
       handleResult(payload){
@@ -296,6 +371,12 @@
     };
     $('logout').onclick=()=>{const bridge=window.HostingAuthNative;if(bridge){setAuthBusy(true);bridge.signOut()}};
     $('verifyEmail').onclick=()=>{const bridge=window.HostingAuthNative;if(bridge){setAuthBusy(true);bridge.sendVerification()}};
+    $('saveGroupName').onclick=()=>{
+      const name=$('groupName').value.trim(),area=$('groupArea').value.trim();
+      if(name.length<2){setSyncStatus('Tên nhóm quá ngắn','error');$('groupName').focus();return}
+      if($('groupPublic').checked&&area.length<2){setSyncStatus('Hãy nhập khu vực','error');$('groupArea').focus();return}
+      if(window.HostingCloudNative){setSyncStatus('Đang lưu nhóm…','syncing');window.HostingCloudNative.updateGroup(name,area,$('groupPublic').checked)}
+    };
     setAuthMode('login');
     if(window.HostingAuthNative)window.HostingAuthNative.requestState();
     const isDone=p=>p.payment==='cash'||p.payment==='transfer'||Boolean(p.end);
@@ -356,7 +437,7 @@
     function clockTime(){const now=new Date();return String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')}
     function updatePayment(p,status){if(status==='unpaid'){if(p.autoOut){p.end='';delete p.autoOut}}else if(p.payment==='unpaid'||!p.end){p.end=clockTime();p.autoOut=true}p.payment=status}
     function finishPayment(p){closeSheet();render();const card=[...$('players').children].find(c=>c.dataset.id===p.id);if(card)card.querySelector('.total').focus();else document.querySelector('[data-filter="'+filter+'"]').focus();toast((p.payment==='unpaid'?'Đã lưu: ':'Đã chuyển vào Đã xong · ')+statuses[p.payment])}
-    document.querySelectorAll('[data-pay]').forEach(b=>b.onclick=()=>{const p=state.players.find(p=>p.id===paymentId);if(!p)return;if(b.dataset.pay==='transfer'){$('receiptSources').hidden=false;$('receiptSources').scrollIntoView({block:'nearest'});return}const previous={payment:p.payment,end:p.end,autoOut:p.autoOut};updatePayment(p,b.dataset.pay);try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){Object.assign(p,previous);toast('Không lưu được thanh toán. Vui lòng thử lại.');return}finishPayment(p)});
+    document.querySelectorAll('[data-pay]').forEach(b=>b.onclick=()=>{const p=state.players.find(p=>p.id===paymentId);if(!p)return;if(b.dataset.pay==='transfer'){$('receiptSources').hidden=false;$('receiptSources').scrollIntoView({block:'nearest'});return}const previous={payment:p.payment,end:p.end,autoOut:p.autoOut};updatePayment(p,b.dataset.pay);try{persistLocal();scheduleCloudSync()}catch(e){Object.assign(p,previous);toast('Không lưu được thanh toán. Vui lòng thử lại.');return}finishPayment(p)});
     function pickReceiptSource(id){capturePlayerId=paymentId;$(id).value='';$(id).click()}
     $('takeReceipt').onclick=()=>pickReceiptSource('receiptCamera');$('pickReceipt').onclick=()=>pickReceiptSource('receiptGallery');
     async function loadReceipt(event){
@@ -374,7 +455,7 @@
      const previous={payment:p.payment,receipt:p.receipt,end:p.end,autoOut:p.autoOut};
      const rollback=()=>{p.payment=previous.payment;p.end=previous.end;p.autoOut=previous.autoOut;if(previous.receipt===undefined)delete p.receipt;else p.receipt=previous.receipt};
      updatePayment(p,'transfer');p.receipt=pendingReceipt;
-     try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){rollback();toast('Không đủ bộ nhớ để lưu ảnh. Chưa đổi trạng thái thanh toán.');return}
+     try{persistLocal();scheduleCloudSync()}catch(e){rollback();toast('Không đủ bộ nhớ để lưu ảnh. Chưa đổi trạng thái thanh toán.');return}
      // Native gallery publication happens only in this explicit confirmation handler.
      if(bridge&&typeof bridge.saveConfirmedPhoto==='function'){
        let saved=false;try{saved=bridge.saveConfirmedPhoto()}catch(e){}
@@ -393,7 +474,16 @@
     };
     $('addPlayer').onclick=()=>editPlayer(null);
     $('playerForm').onsubmit=e=>{e.preventDefault();const name=$('playerName').value.trim();if(!name){$('playerName').setCustomValidity('Vui lòng nhập tên người chơi');$('playerName').reportValidity();return}if(editId){const p=state.players.find(p=>p.id===editId);if(p.end!==$('timeOut').value)delete p.autoOut;Object.assign(p,{name,start:$('timeIn').value,end:$('timeOut').value})}else state.players.push({id:'p'+Date.now()+Math.random().toString(36).slice(2,7),name,start:$('timeIn').value,end:$('timeOut').value,sets:0,money:0,water:0,payment:'unpaid'});save();closeSheet();render();toast('Đã lưu người chơi')};$('playerName').oninput=()=>$('playerName').setCustomValidity('');
-    $('sessionDate').onchange=()=>{if($('sessionDate').value){state.date=$('sessionDate').value;save()}else $('sessionDate').value=state.date};
+    $('sessionDate').onchange=()=>{
+      const nextDate=$('sessionDate').value;
+      if(!nextDate){$('sessionDate').value=state.date;return}
+      try{persistLocal()}catch(e){$('storageWarning').hidden=false}
+      const previousPrice=state.shuttles&&state.shuttles.price||0;
+      state=sessions[nextDate]?clone(sessions[nextDate]):emptySession(nextDate,previousPrice);
+      sessions[nextDate]=state;selected.clear();
+      try{persistLocal()}catch(e){$('storageWarning').hidden=false}
+      renderShuttles();render();connectCloud();
+    };
     $('setPlayers').onchange=e=>{if(e.target.checked)selected.add(e.target.value);else selected.delete(e.target.value);updateSelection()};
     $('setSlots').onclick=e=>{
       const remove=e.target.closest('button[data-remove]');
