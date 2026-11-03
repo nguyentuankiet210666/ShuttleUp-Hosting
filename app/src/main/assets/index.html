@@ -210,6 +210,7 @@
         .schedule-hero{margin:0 -10px 9px;padding:calc(9px + env(safe-area-inset-top,0px)) 15px 13px;border-radius:0 0 19px 19px;background:radial-gradient(ellipse at 96% 93%,#b5f31e2c 0 21%,transparent 21.5%),linear-gradient(145deg,#062a54,#0b477c)}.schedule-hero .community-brand{margin-bottom:11px!important}.schedule-title{display:flex;align-items:center;gap:8px}.schedule-title .ui-icon{width:25px;height:25px}.schedule-hero h1{margin:0;font-size:24px}.schedule-hero p{margin:3px 0 0;font-size:11px}
         .segmented{margin-bottom:10px;padding:3px;border-radius:12px}.segmented button{min-height:34px;font-size:11px}.schedule-list{gap:7px}.schedule-item{grid-template-columns:58px minmax(0,1fr);gap:8px;position:relative;padding:8px;border-radius:14px}.schedule-thumb{width:58px;height:58px;border-radius:11px;background:url('images/shuttle-cover.jpg') center/cover no-repeat}.schedule-info{padding-right:4px}.schedule-info strong{padding-right:68px;font-size:11px;line-height:1.25}.schedule-info small{display:flex;align-items:center;gap:3px;margin-top:3px;font-size:9px}.schedule-info .ui-icon{flex:0 0 auto;width:12px;height:12px}.status-pill{position:absolute;right:7px;top:7px;padding:4px 6px;font-size:8px}.schedule-list+.join-cta{margin-top:10px!important}
         .community-nav{padding:2px 6px calc(3px + env(safe-area-inset-bottom,0px));box-shadow:0 -4px 14px #102c4510}.community-nav .wrap{grid-template-columns:1fr 1fr 54px 1fr 1fr}.community-nav button{position:relative;min-height:52px;padding:3px 1px;border-radius:0;font-size:9px;gap:2px}.community-nav button .ui-icon{width:20px;height:20px}.community-nav button.active{color:#284f00;background:transparent}.community-nav button.active:not(.create-fab):after{content:'';position:absolute;left:25%;right:25%;bottom:0;height:3px;border-radius:3px;background:var(--lime)}.community-nav .create-fab{width:50px;height:50px;min-height:50px;margin-top:-18px;border-width:4px;font-size:0}.community-nav .create-fab .ui-icon{width:25px;height:25px}.community-nav .create-fab.active{background:var(--lime);color:#173f00}
+        .community-nav.owner-unavailable .wrap{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.community-nav.owner-unavailable button{width:auto}.community-nav.owner-unavailable button.active:after{left:32%;right:32%}
         @media(max-width:350px){.community-hero h1{font-size:23px}.community-hero>p{font-size:11px}.filter-chip{padding-left:7px;padding-right:7px}.schedule-item{grid-template-columns:52px minmax(0,1fr)}.schedule-thumb{width:52px;height:52px}}
 
         /* Creator-only session management. */
@@ -481,6 +482,7 @@
       const signedIn=Boolean(user&&user.uid);
       currentUser=signedIn?user:null;
       document.querySelectorAll('[data-owner-only]').forEach(el=>el.hidden=!signedIn);
+      document.querySelector('.community-nav').classList.toggle('owner-unavailable',!signedIn);
       $('authGuest').hidden=signedIn;$('authUser').hidden=!signedIn;
       $('authBadge').textContent=signedIn?'Đã đăng nhập':'Chưa đăng nhập';
       $('cloudCard').hidden=!signedIn;
@@ -530,6 +532,7 @@
     };
     setAuthMode('login');
     document.querySelectorAll('[data-owner-only]').forEach(el=>el.hidden=true);
+    document.querySelector('.community-nav').classList.add('owner-unavailable');
     if(window.HostingAuthNative)window.HostingAuthNative.requestState();
     const isDone=p=>p.payment==='cash'||p.payment==='transfer'||Boolean(p.end);
     function renderTotals(){ const paid=state.players.filter(p=>p.payment!=='unpaid'),received=paid.reduce((n,p)=>n+total(p),0),waterPaid=paid.reduce((n,p)=>n+p.water,0),water=state.players.reduce((n,p)=>n+p.water,0);$('receivedTotal').textContent=money(received);$('waterTotal').textContent=money(water);$('waterPaid').textContent=money(waterPaid);$('waterUnpaid').textContent=money(water-waterPaid);$('hostTotal').textContent=money(received-waterPaid); $('cashTotal').textContent=money(state.players.filter(p=>p.payment==='cash').reduce((n,p)=>n+total(p),0));$('transferTotal').textContent=money(state.players.filter(p=>p.payment==='transfer').reduce((n,p)=>n+total(p),0)); $('grandTotal').textContent=money(state.players.reduce((n,p)=>n+total(p),0));$('unpaidTotal').textContent=money(state.players.filter(p=>p.payment==='unpaid').reduce((n,p)=>n+total(p),0)); }
@@ -744,3 +747,4 @@
 </script>
 </body>
 </html>
+
