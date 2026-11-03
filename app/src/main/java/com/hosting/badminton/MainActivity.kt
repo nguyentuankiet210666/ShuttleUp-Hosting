@@ -189,7 +189,7 @@ class MainActivity : ComponentActivity() {
 
     inner class CloudBridge {
         @JavascriptInterface
-        fun connect(date: String, payload: String) {
+        fun connect(date: String, payload: String, createIfMissing: Boolean) {
             val user = firebaseAuth?.currentUser
             val db = firebaseDb
             if (user == null || db == null) {
@@ -245,7 +245,7 @@ class MainActivity : ComponentActivity() {
                                 group.getString("area") ?: "",
                                 group.getBoolean("isPublic") ?: false
                             )
-                            connectSession(db, groupId, date)
+                            connectSession(db, groupId, date, payload, createIfMissing)
                         }
                         .addOnFailureListener { sendCloudFailure(it) }
                 }
@@ -353,7 +353,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun connectSession(db: FirebaseFirestore, groupId: String, date: String) {
+    private fun connectSession(
+        db: FirebaseFirestore,
+        groupId: String,
+        date: String,
+        localPayload: String,
+        createIfMissing: Boolean
+    ) {
         sessionRegistration?.remove()
         sessionRegistration = null
         connectedSessionDate = date
@@ -374,9 +380,25 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     attachSessionListener(ref, date)
+                } else if (createIfMissing) {
+                    // Only an explicit "create session" action may seed a cloud document.
+                    ref.set(
+                        mapOf(
+                            "date" to date,
+                            "payload" to localPayload,
+                            "creatorUid" to groupId,
+                            "updatedBy" to groupId,
+                            "createdAt" to FieldValue.serverTimestamp(),
+                            "updatedAt" to FieldValue.serverTimestamp()
+                        )
+                    )
+                        .addOnSuccessListener {
+                            sendCloudStatus(true, "Đã đồng bộ")
+                            attachSessionListener(ref, date)
+                        }
+                        .addOnFailureListener { sendCloudFailure(it) }
                 } else {
-                    // Connecting is read-only. A missing cloud document must not cause
-                    // cached data from another account to be uploaded automatically.
+                    // Normal connection is read-only, so cached data cannot cross accounts.
                     sendCloudStatus(true, "Chưa có dữ liệu trên cloud")
                     attachSessionListener(ref, date)
                 }
