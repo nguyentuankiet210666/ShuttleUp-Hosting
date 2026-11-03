@@ -50,31 +50,39 @@ Nếu chưa có `google-services.json`, ứng dụng vẫn chạy các chức n�
 
 ## 4. Tạo Firestore
 
-Tạo Cloud Firestore và ưu tiên cấu trúc dữ liệu:
+Tạo Cloud Firestore. Chọn khu vực gần phần lớn người dùng (ví dụ Singapore cho cộng đồng ở Đông Nam Á) vì vị trí database không thể đổi sau khi tạo.
+
+Cấu trúc dữ liệu hiện tại và phần mở rộng cho cộng đồng:
 
 ```text
 users/{uid}
-  profile
-  sessions/{sessionId}
-    date
-    courts
-    shuttleCount
-    shuttlePrice
-    players/{playerId}
-      name
-      timeIn
-      timeOut
-      sets
-      money
-      water
-      payment
+  displayName, email, defaultGroupId
+
+groups/{groupId}
+  name, area, areaKey, isPublic, ownerUid, memberCount
+  members/{uid}
+    displayName, role, joinedAt
+  sessions/{yyyy-MM-dd}
+    date, payload, updatedBy, updatedAt
+  joinRequests/{uid}
+    userId, status, createdAt
+  messages/{messageId}
+    senderUid, text, createdAt
 ```
 
-Cách này giúp rule bảo mật đơn giản hơn và tránh host này đọc dữ liệu của host khác.
+Mỗi tài khoản mới bắt đầu với một nhóm do chính tài khoản đó sở hữu. Nhóm chỉ xuất hiện trong kết quả tìm kiếm khi `isPublic = true` và đã có khu vực.
 
 ## 5. Security Rules
 
-Repo có file `firestore.rules` mẫu. Rule mặc định yêu cầu đăng nhập và chỉ cho tài khoản thao tác trong `users/{uid}` của chính mình.
+Repo có file `firestore.rules`. Sao chép nội dung file này vào **Firestore Database → Rules** rồi bấm **Publish**.
+
+Rule hiện tại cho phép:
+
+- Người dùng chỉ đọc/sửa hồ sơ của chính mình.
+- Người đã đăng nhập xem danh sách nhóm công khai.
+- Chỉ chủ nhóm sửa hồ sơ nhóm và duyệt yêu cầu tham gia.
+- Thành viên nhóm đọc/sửa dữ liệu buổi chơi và đọc/gửi tin nhắn.
+- Người gửi chỉ sửa hoặc xóa tin nhắn của chính họ.
 
 Không dùng rule kiểu:
 
@@ -84,16 +92,22 @@ allow read, write: if true;
 
 cho app thật, vì như vậy bất kỳ client nào cũng có thể đọc hoặc sửa dữ liệu.
 
-## 6. Thứ tự tích hợp tiếp theo
+## 6. Luồng đồng bộ hiện tại
 
-1. Email/Password Login
-2. Lấy Firebase UID
-3. Tạo `users/{uid}`
-4. Chuyển dữ liệu session/player từ localStorage lên Firestore
-5. Giữ localStorage làm cache/offline tạm thời
-6. Thêm listener Firestore để đồng bộ nhiều máy
+1. Đăng nhập bằng Email/Password và lấy Firebase UID.
+2. Tạo/cập nhật hồ sơ `users/{uid}` và nhóm mặc định `groups/{uid}`.
+3. Mỗi ngày được lưu thành một tài liệu trong `sessions/{yyyy-MM-dd}`.
+4. Listener Firestore nhận thay đổi để cập nhật thiết bị đang mở cùng buổi chơi.
+5. `localStorage` tiếp tục làm cache và giữ dữ liệu khi ngoại tuyến.
+6. Ảnh biên lai không tải lên Firestore; ảnh chỉ nằm trên thiết bị.
 
-Google Login có thể bổ sung sau khi luồng tài khoản email hoạt động ổn định.
+## 7. Bước cộng đồng tiếp theo
+
+1. Màn hình khám phá nhóm công khai, lọc theo `areaKey`.
+2. Gửi và duyệt yêu cầu tham gia.
+3. Danh sách thành viên, vai trò chủ nhóm/thành viên.
+4. Bảng tin hoặc trò chuyện theo nhóm.
+5. Tạo lịch chơi, giới hạn số người và đăng ký tham gia.
 
 Trong giai đoạn chuyển đổi, không xoá localStorage ngay để tránh mất dữ liệu đang có.
 
