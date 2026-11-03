@@ -245,7 +245,7 @@ class MainActivity : ComponentActivity() {
                                 group.getString("area") ?: "",
                                 group.getBoolean("isPublic") ?: false
                             )
-                            connectSession(db, groupId, date, payload)
+                            connectSession(db, groupId, date)
                         }
                         .addOnFailureListener { sendCloudFailure(it) }
                 }
@@ -353,7 +353,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun connectSession(db: FirebaseFirestore, groupId: String, date: String, localPayload: String) {
+    private fun connectSession(db: FirebaseFirestore, groupId: String, date: String) {
         sessionRegistration?.remove()
         sessionRegistration = null
         connectedSessionDate = date
@@ -375,21 +375,10 @@ class MainActivity : ComponentActivity() {
                     }
                     attachSessionListener(ref, date)
                 } else {
-                    ref.set(
-                        mapOf(
-                            "date" to date,
-                            "payload" to localPayload,
-                            "creatorUid" to groupId,
-                            "updatedBy" to groupId,
-                            "createdAt" to FieldValue.serverTimestamp(),
-                            "updatedAt" to FieldValue.serverTimestamp()
-                        )
-                    )
-                        .addOnSuccessListener {
-                            sendCloudStatus(true, "Đã đồng bộ")
-                            attachSessionListener(ref, date)
-                        }
-                        .addOnFailureListener { sendCloudFailure(it) }
+                    // Connecting is read-only. A missing cloud document must not cause
+                    // cached data from another account to be uploaded automatically.
+                    sendCloudStatus(true, "Chưa có dữ liệu trên cloud")
+                    attachSessionListener(ref, date)
                 }
             }
             .addOnFailureListener { sendCloudFailure(it) }
