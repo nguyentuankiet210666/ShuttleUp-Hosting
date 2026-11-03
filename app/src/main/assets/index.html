@@ -388,7 +388,8 @@
 <div id="toast" class="toast" role="status" hidden></div>
 <script>
     'use strict';
-    const $=id=>document.getElementById(id), KEY='hosting.mobile.demo.v1', SESSIONS_KEY='hosting.mobile.sessions.v2', statuses={cash:'Tiền mặt',transfer:'Chuyển khoản',unpaid:'Chưa thanh toán'};
+    const $=id=>document.getElementById(id), KEY='hosting.mobile.demo.v1', SESSIONS_KEY='hosting.mobile.sessions.v2', LEGACY_GUEST_KEY='hosting.mobile.legacyGuestAvailable.v1', statuses={cash:'Tiền mặt',transfer:'Chuyển khoản',unpaid:'Chưa thanh toán'};
+    const scopedSessionsKey=owner=>`${SESSIONS_KEY}.${owner||'guest'}`;
     const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
     const defaultSessionMeta=(date=today())=>({title:'Buổi chơi '+date,start:'19:00',end:'21:00',venue:'',capacity:8});
     const emptySession=(date=today(),price=0,meta={})=>({date,players:[],shuttles:{count:0,price},meta:{...defaultSessionMeta(date),...meta}});
@@ -396,27 +397,64 @@
     const validState=value=>value&&Array.isArray(value.players)&&/^\d{4}-\d{2}-\d{2}$/.test(value.date)&&value.players.every(p=>p&&typeof p.id==='string'&&typeof p.name==='string'&&typeof p.start==='string'&&typeof p.end==='string'&&[p.sets,p.money,p.water].every(n=>Number.isSafeInteger(n)&&n>=0)&&Object.hasOwn(statuses,p.payment));
     const clone=value=>JSON.parse(JSON.stringify(value));
     const normalizeSession=value=>{const safe=clone(value);if(!safe.shuttles)safe.shuttles={count:0,price:0};safe.meta={...defaultSessionMeta(safe.date),...(safe.meta||{})};safe.meta.capacity=Math.max(2,Math.min(40,Number(safe.meta.capacity)||8));return safe};
-    let state=seed(),sessions={},hasStoredHistory=false,filter='all',selected=new Set(),paymentId=null,editId=null,activeOverlay=null,returnFocus=null,toastTimer;
-    try{
-      const history=JSON.parse(localStorage.getItem(SESSIONS_KEY)||'null');
-      if(history&&history.sessions&&typeof history.sessions==='object'){
-        hasStoredHistory=true;
-        Object.entries(history.sessions).forEach(([date,value])=>{if(validState(value))sessions[date]=normalizeSession(value)});
-        if(sessions[history.activeDate])state=sessions[history.activeDate];
-      }else{
-        const legacy=JSON.parse(localStorage.getItem(KEY)||'null');
-        if(validState(legacy))state=normalizeSession(legacy);
+    let state=seed(),sessions={},storageOwner='guest',legacyGuestAvailable=false,filter='all',selected=new Set(),paymentId=null,editId=null,activeOverlay=null,returnFocus=null,toastTimer;
+    function readStoredState(owner){
+      let nextState=seed(),nextSessions={},hasStoredHistory=false,migratedLegacy=false;
+      try{
+        const scopedRaw=localStorage.getItem(scopedSessionsKey(owner));
+        const unscopedHistoryRaw=owner==='guest'&&!scopedRaw?localStorage.getItem(SESSIONS_KEY):null;
+        const history=JSON.parse(scopedRaw||unscopedHistoryRaw||'null');
+        migratedLegacy=Boolean(unscopedHistoryRaw);
+        if(history&&history.sessions&&typeof history.sessions==='object'){
+          hasStoredHistory=true;
+          Object.entries(history.sessions).forEach(([date,value])=>{if(validState(value))nextSessions[date]=normalizeSession(value)});
+          if(nextSessions[history.activeDate])nextState=nextSessions[history.activeDate];
+        }else if(owner==='guest'&&!scopedRaw){
+          const legacyRaw=localStorage.getItem(KEY);
+          const legacy=JSON.parse(legacyRaw||'null');
+          migratedLegacy=Boolean(legacyRaw);
+          if(validState(legacy))nextState=normalizeSession(legacy);
+        }
+        if(Object.keys(nextSessions).length&&!nextSessions[nextState.date])nextState=nextSessions[Object.keys(nextSessions).sort().reverse()[0]];
+        if(!hasStoredHistory)nextSessions[nextState.date]=nextState;
+      }catch(e){$('storageWarning').hidden=false}
+      return {state:nextState,sessions:nextSessions,migratedLegacy};
+    }
+    function loadStorageOwner(owner){
+      storageOwner=owner||'guest';
+      const loaded=readStoredState(storageOwner);
+      state=loaded.state;sessions=loaded.sessions;
+      if(storageOwner==='guest'&&loaded.migratedLegacy){
+        legacyGuestAvailable=true;
+        localStorage.setItem(LEGACY_GUEST_KEY,'1');
+        localStorage.setItem(scopedSessionsKey('guest'),JSON.stringify({activeDate:state.date,sessions}));
+      }else if(storageOwner==='guest'){
+        legacyGuestAvailable=localStorage.getItem(LEGACY_GUEST_KEY)==='1';
       }
-      if(Object.keys(sessions).length&&!sessions[state.date])state=sessions[Object.keys(sessions).sort().reverse()[0]];
-      if(!hasStoredHistory)sessions[state.date]=state;
-    }catch(e){$('storageWarning').hidden=false}
+    }
+    loadStorageOwner('guest');
     const escapeHTML=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const money=n=>n.toLocaleString('vi-VN')+'đ',total=p=>p.money+p.water;
     function persistHistory(){
-      localStorage.setItem(KEY,JSON.stringify(state));
-      localStorage.setItem(SESSIONS_KEY,JSON.stringify({activeDate:state.date,sessions}));
+      localStorage.setItem(scopedSessionsKey(storageOwner),JSON.stringify({activeDate:state.date,sessions}));
     }
     function persistLocal(){sessions[state.date]=state;persistHistory()}
+    function switchStorageOwner(owner){
+      const nextOwner=owner||'guest';
+      if(nextOwner===storageOwner)return;
+      try{persistLocal()}catch(e){$('storageWarning').hidden=false}
+      if(storageOwner==='guest'&&nextOwner!=='guest'&&legacyGuestAvailable&&!localStorage.getItem(scopedSessionsKey(nextOwner))){
+        const importLegacy=confirm('Tìm thấy dữ liệu cũ trên thiết bị. Bạn có muốn nhập dữ liệu này vào tài khoản đang đăng nhập không?');
+        if(importLegacy){
+          const guestData=localStorage.getItem(scopedSessionsKey('guest'));
+          if(guestData)localStorage.setItem(scopedSessionsKey(nextOwner),guestData);
+          localStorage.removeItem(LEGACY_GUEST_KEY);
+          legacyGuestAvailable=false;
+        }
+      }
+      loadStorageOwner(nextOwner);selected.clear();paymentId=null;editId=null;
+      renderShuttles();render();
+    }
     function save(){try{persistLocal();scheduleCloudSync()}catch(e){$('storageWarning').hidden=false}}
     function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,2500)}
     let authMode='login',authBusy=false,currentUser=null,cloudTimer=null,applyingCloud=false;
@@ -488,6 +526,7 @@
     function renderAuth(user){
       const signedIn=Boolean(user&&user.uid);
       currentUser=signedIn?user:null;
+      switchStorageOwner(signedIn?user.uid:'guest');
       document.querySelectorAll('[data-owner-only]').forEach(el=>el.hidden=!signedIn);
       document.querySelector('.community-nav').classList.toggle('owner-unavailable',!signedIn);
       $('authGuest').hidden=signedIn;$('authUser').hidden=!signedIn;
@@ -649,7 +688,7 @@
      if(!file.type.startsWith('image/')){toast('Vui lòng chụp hoặc chọn ảnh');return}
      if(file.size>30*1024*1024){toast('Ảnh quá lớn. Vui lòng chụp lại.');return}
      const url=URL.createObjectURL(file);
-     try{const img=new Image();await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});const scale=Math.min(1,1400/Math.max(img.width,img.height));const canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);if(paymentId!==target||!activeOverlay)return;pendingReceipt=canvas.toDataURL('image/jpeg',0.8);showReceipt(pendingReceipt);$('confirmReceipt').hidden=false;$('confirmReceipt').scrollIntoView({block:'nearest'})}catch(e){toast('Không đọc được ảnh. Vui lòng chụp lại.')}finally{URL.revokeObjectURL(url)}
+     try{const img=new Image();await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});const scale=Math.min(1,1100/Math.max(img.width,img.height));const canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);if(paymentId!==target||!activeOverlay)return;pendingReceipt=canvas.toDataURL('image/jpeg',0.72);if(pendingReceipt.length>480000){pendingReceipt=null;toast('Ảnh sau khi nén vẫn quá lớn. Hãy chọn ảnh khác.');return}showReceipt(pendingReceipt);$('confirmReceipt').hidden=false;$('confirmReceipt').scrollIntoView({block:'nearest'})}catch(e){toast('Không đọc được ảnh. Vui lòng chụp lại.')}finally{URL.revokeObjectURL(url)}
     }
     $('receiptCamera').addEventListener('change',loadReceipt);$('receiptGallery').addEventListener('change',loadReceipt);
     $('confirmReceipt').onclick=()=>{
@@ -692,7 +731,7 @@
       if(!start||!end||end<=start){fail('Giờ kết thúc phải sau giờ bắt đầu.');return}
       if(!Number.isSafeInteger(capacity)||capacity<2||capacity>40){fail('Số người tối đa từ 2 đến 40.');return}
       try{persistLocal()}catch(err){$('storageWarning').hidden=false}
-      const price=state.shuttles&&state.shuttles.price||0;state=emptySession(date,price,{title,start,end,venue,capacity});sessions[date]=state;selected.clear();persistLocal();renderShuttles();render();closeSheet();connectCloud();showPage('home');toast('Đã tạo buổi chơi mới');
+      const price=state.shuttles&&state.shuttles.price||0;state=emptySession(date,price,{title,start,end,venue,capacity});sessions[date]=state;selected.clear();persistLocal();renderShuttles();render();closeSheet();connectCloud();scheduleCloudSync();showPage('home');toast('Đã tạo buổi chơi mới');
     };
     $('ownerSessionList').onclick=e=>{
       const open=e.target.closest('[data-open-session]'),remove=e.target.closest('[data-delete-session]');
