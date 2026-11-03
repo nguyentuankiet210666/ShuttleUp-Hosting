@@ -31,13 +31,20 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.SetOptions
 import org.json.JSONObject
 import java.io.File
 
 class MainActivity : ComponentActivity() {
     private lateinit var webView: WebView
     private var firebaseAuth: FirebaseAuth? = null
+    private var firebaseDb: FirebaseFirestore? = null
     private var authStateListener: FirebaseAuth.AuthStateListener? = null
+    private var sessionRegistration: ListenerRegistration? = null
+    private var connectedSessionDate: String? = null
     private var pendingCallback: ValueCallback<Array<Uri>>? = null
     private var pendingUri: Uri? = null
     @Volatile private var stagedPhoto: Uri? = null
@@ -179,6 +186,247 @@ class MainActivity : ComponentActivity() {
             )
         }
     }
+
+    inner class CloudBridge {
+        @JavascriptInterface
+        fun connect(date: String, payload: String) {
+            val user = firebaseAuth?.currentUser
+            val db = firebaseDb
+            if (user == null || db == null) {
+                sendCloudError("Chưa thể kết nối Firestore.")
+                return
+            }
+            if (!validCloudPayload(date, payload)) return
+            val groupId = user.uid
+            val groupRef = db.collection("groups").document(groupId)
+            groupRef.get()
+                .addOnSuccessListener { group ->
+                    val defaultName = "Nhóm của " + (user.displayName?.takeIf { it.isNotBlank() } ?: "Hosting")
+                    val batch = db.batch()
+                    batch.set(
+                        db.collection("users").document(user.uid),
+                        mapOf(
+                            "displayName" to (user.displayName ?: ""),
+                            "email" to (user.email ?: ""),
+                            "defaultGroupId" to groupId,
+                            "updatedAt" to FieldValue.serverTimestamp()
+                        ),
+                        SetOptions.merge()
+                    )
+                    if (!group.exists()) {
+                        batch.set(
+                            groupRef,
+                            mapOf(
+                                "name" to defaultName,
+                                "area" to "",
+                                "areaKey" to "",
+                                "isPublic" to false,
+                                "ownerUid" to user.uid,
+                                "memberCount" to 1,
+                                "createdAt" to FieldValue.serverTimestamp(),
+                                "updatedAt" to FieldValue.serverTimestamp()
+                            )
+                        )
+                    }
+                    batch.set(
+                        groupRef.collection("members").document(user.uid),
+                        mapOf(
+                            "uid" to user.uid,
+                            "displayName" to (user.displayName ?: ""),
+                            "role" to "owner",
+                            "joinedAt" to FieldValue.serverTimestamp()
+                        ),
+                        SetOptions.merge()
+                    )
+                    batch.commit()
+                        .addOnSuccessListener {
+                            sendGroup(
+                                group.getString("name") ?: defaultName,
+                                group.getString("area") ?: "",
+                                group.getBoolean("isPublic") ?: false
+                            )
+                            connectSession(db, groupId, date, payload)
+                        }
+                        .addOnFailureListener { sendCloudFailure(it) }
+                }
+                .addOnFailureListener { sendCloudFailure(it) }
+        }
+
+        @JavascriptInterface
+        fun saveSession(date: String, payload: String) {
+            val user = firebaseAuth?.currentUser
+            val db = firebaseDb
+            if (user == null || db == null) {
+                sendCloudError("Bạn cần đăng nhập để đồng bộ.")
+                return
+            }
+            if (!validCloudPayload(date, payload)) return
+            db.collection("groups").document(user.uid).collection("sessions").document(date)
+                .set(
+                    mapOf(
+                        "date" to date,
+                        "payload" to payload,
+                        "updatedBy" to user.uid,
+                        "updatedAt" to FieldValue.serverTimestamp()
+                    ),
+                    SetOptions.merge()
+                )
+                .addOnSuccessListener { sendCloudStatus(true, "Đã đồng bộ") }
+                .addOnFailureListener { sendCloudFailure(it) }
+        }
+
+        @JavascriptInterface
+        fun updateGroup(name: String, area: String, isPublic: Boolean) {
+            val user = firebaseAuth?.currentUser
+            val db = firebaseDb
+            val cleanName = name.trim()
+            val cleanArea = area.trim()
+            if (user == null || db == null) {
+                sendCloudError("Bạn cần đăng nhập để sửa nhóm.")
+                return
+            }
+            if (cleanName.length !in 2..70 || cleanArea.length > 80 || (isPublic && cleanArea.length < 2)) {
+                sendCloudError("Tên hoặc khu vực nhóm chưa hợp lệ.")
+                return
+            }
+            db.collection("groups").document(user.uid)
+                .set(
+                    mapOf(
+                        "name" to cleanName,
+                        "area" to cleanArea,
+                        "areaKey" to cleanArea.lowercase(),
+                        "isPublic" to isPublic,
+                        "ownerUid" to user.uid,
+                        "updatedAt" to FieldValue.serverTimestamp()
+                    ),
+                    SetOptions.merge()
+                )
+                .addOnSuccessListener {
+                    sendGroup(cleanName, cleanArea, isPublic)
+                    sendCloudStatus(true, "Đã lưu nhóm")
+                }
+                .addOnFailureListener { sendCloudFailure(it) }
+        }
+
+        @JavascriptInterface
+        fun disconnect() {
+            sessionRegistration?.remove()
+            sessionRegistration = null
+            connectedSessionDate = null
+        }
+    }
+
+    private fun validCloudPayload(date: String, payload: String): Boolean {
+        if (!Regex("^\\d{4}-\\d{2}-\\d{2}$").matches(date) || payload.length > 750_000) {
+            sendCloudError("Dữ liệu buổi chơi không hợp lệ hoặc quá lớn.")
+            return false
+        }
+        return try {
+            JSONObject(payload).getString("date") == date
+        } catch (_: Exception) {
+            sendCloudError("Không đọc được dữ liệu buổi chơi.")
+            false
+        }
+    }
+
+    private fun connectSession(db: FirebaseFirestore, groupId: String, date: String, localPayload: String) {
+        sessionRegistration?.remove()
+        sessionRegistration = null
+        connectedSessionDate = date
+        val ref = db.collection("groups").document(groupId).collection("sessions").document(date)
+        ref.get()
+            .addOnSuccessListener { document ->
+                if (connectedSessionDate != date) return@addOnSuccessListener
+                if (document.exists()) {
+                    document.getString("payload")?.let { sendCloudSession(date, it) }
+                    attachSessionListener(ref, date)
+                } else {
+                    ref.set(
+                        mapOf(
+                            "date" to date,
+                            "payload" to localPayload,
+                            "updatedBy" to groupId,
+                            "createdAt" to FieldValue.serverTimestamp(),
+                            "updatedAt" to FieldValue.serverTimestamp()
+                        )
+                    )
+                        .addOnSuccessListener {
+                            sendCloudStatus(true, "Đã đồng bộ")
+                            attachSessionListener(ref, date)
+                        }
+                        .addOnFailureListener { sendCloudFailure(it) }
+                }
+            }
+            .addOnFailureListener { sendCloudFailure(it) }
+    }
+
+    private fun attachSessionListener(
+        ref: com.google.firebase.firestore.DocumentReference,
+        date: String
+    ) {
+        sessionRegistration?.remove()
+        sessionRegistration = ref.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                sendCloudFailure(error)
+                return@addSnapshotListener
+            }
+            if (connectedSessionDate == date && snapshot?.exists() == true) {
+                snapshot.getString("payload")?.let { sendCloudSession(date, it) }
+            }
+        }
+    }
+
+    private fun sendGroup(name: String, area: String, isPublic: Boolean) {
+        sendCloudResult(JSONObject().apply {
+            put("type", "group")
+            put("name", name)
+            put("area", area)
+            put("isPublic", isPublic)
+        })
+    }
+
+    private fun sendCloudSession(date: String, payload: String) {
+        sendCloudResult(JSONObject().apply {
+            put("type", "session")
+            put("date", date)
+            put("payload", payload)
+        })
+    }
+
+    private fun sendCloudStatus(ok: Boolean, message: String) {
+        sendCloudResult(JSONObject().apply {
+            put("type", "status")
+            put("ok", ok)
+            put("message", message)
+        })
+    }
+
+    private fun sendCloudFailure(error: Exception) {
+        val message = if (error is FirebaseNetworkException) {
+            "Mất kết nối; dữ liệu vẫn được giữ trên máy."
+        } else {
+            "Chưa đồng bộ được. Hãy kiểm tra Firestore và thử lại."
+        }
+        sendCloudError(message)
+    }
+
+    private fun sendCloudError(message: String) {
+        sendCloudResult(JSONObject().apply {
+            put("type", "error")
+            put("message", message)
+        })
+    }
+
+    private fun sendCloudResult(payload: JSONObject) {
+        if (!::webView.isInitialized) return
+        webView.post {
+            webView.evaluateJavascript(
+                "window.HostingCloud&&window.HostingCloud.handleResult(${JSONObject.quote(payload.toString())})",
+                null
+            )
+        }
+    }
+
     private val choosePhoto = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         val callback = pendingCallback
         pendingCallback = null
@@ -269,6 +517,9 @@ class MainActivity : ComponentActivity() {
         firebaseAuth = if (FirebaseApp.getApps(this).isNotEmpty()) {
             runCatching { FirebaseAuth.getInstance() }.getOrNull()
         } else null
+        firebaseDb = if (FirebaseApp.getApps(this).isNotEmpty()) {
+            runCatching { FirebaseFirestore.getInstance() }.getOrNull()
+        } else null
         // The HTML keeps a compressed copy after confirmation. Remove old temporary captures.
         val photoDir = File(cacheDir, "receipt-camera").apply { mkdirs() }
         photoDir.listFiles()?.filter { System.currentTimeMillis() - it.lastModified() > 86400000L }
@@ -279,6 +530,7 @@ class MainActivity : ComponentActivity() {
             settings.allowContentAccess = true
             addJavascriptInterface(ReceiptBridge(), "HostingReceipt")
             addJavascriptInterface(AuthBridge(), "HostingAuthNative")
+            addJavascriptInterface(CloudBridge(), "HostingCloudNative")
             webViewClient = object : WebViewClient() {
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
@@ -337,7 +589,14 @@ class MainActivity : ComponentActivity() {
         ViewCompat.requestApplyInsets(container)
         webView.loadUrl("file:///android_asset/index.html")
         firebaseAuth?.let {
-            authStateListener = FirebaseAuth.AuthStateListener { sendAuthState() }
+            authStateListener = FirebaseAuth.AuthStateListener { auth ->
+                if (auth.currentUser == null) {
+                    sessionRegistration?.remove()
+                    sessionRegistration = null
+                    connectedSessionDate = null
+                }
+                sendAuthState()
+            }
         }
     }
 
@@ -356,6 +615,8 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        sessionRegistration?.remove()
+        sessionRegistration = null
         pendingCallback?.onReceiveValue(null)
         pendingCallback = null
         webView.destroy()
