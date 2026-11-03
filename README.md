@@ -1,8 +1,8 @@
 # 🏸 ShuttleUp Hosting
 
-**Hosting** là ứng dụng Android hỗ trợ người tổ chức (host) quản lý một buổi chơi cầu lông trên điện thoại: người chơi, phân set, số cầu và thanh toán.
+**ShuttleUp Hosting** là ứng dụng Android đang phát triển theo hướng kết nối cộng đồng cầu lông: tạo nhóm theo khu vực, tổ chức buổi chơi, trao đổi và tìm người chơi phù hợp.
 
-> **Trạng thái:** Đang phát triển. Ứng dụng đã có tạo tài khoản và đăng nhập Firebase bằng email/mật khẩu. Dữ liệu quản lý buổi chơi vẫn lưu **cục bộ trên thiết bị** và chưa đồng bộ Firestore.
+> **Trạng thái:** Đã có tài khoản Firebase, hồ sơ nhóm theo khu vực, nhiều buổi chơi theo ngày và đồng bộ Firestore. Dữ liệu vẫn được giữ cục bộ để ứng dụng tiếp tục hoạt động khi mạng không ổn định.
 
 ## ✨ Chức năng đang có
 
@@ -15,6 +15,8 @@
 | 🪶 Cầu | Theo dõi số lượng và đơn giá cầu |
 | 📊 Tổng hợp | Xem tổng tiền trong buổi chơi |
 | 👤 Tài khoản | Tạo tài khoản, đăng nhập, xác minh email và đăng xuất |
+| ☁️ Đồng bộ | Đồng bộ nhóm và từng buổi chơi giữa các thiết bị đăng nhập cùng tài khoản |
+| 📍 Nhóm khu vực | Đặt tên, khu vực và trạng thái công khai cho nhóm |
 
 ## 📱 Giao diện và demo
 
@@ -30,11 +32,11 @@
 
 - **Kotlin**: ứng dụng Android và WebView.
 - **HTML/CSS/JavaScript**: giao diện trong `app/src/main/assets/index.html`.
-- **localStorage**: lưu trạng thái dữ liệu hiện tại ngay trên thiết bị.
+- **localStorage**: bộ nhớ cục bộ và cache khi ngoại tuyến.
 - **Firebase Authentication**: tạo tài khoản và đăng nhập bằng email/mật khẩu.
-- **Cloud Firestore**: đã chuẩn bị dependency và security rules, chưa đồng bộ dữ liệu buổi chơi.
+- **Cloud Firestore**: đồng bộ hồ sơ nhóm, thành viên và các buổi chơi theo ngày.
 
-**Lưu ý dữ liệu:** Chưa có đồng bộ đám mây. Không nên xóa dữ liệu ứng dụng hoặc gỡ cài đặt nếu chưa sao lưu thông tin cần giữ.
+**Lưu ý dữ liệu:** Ảnh biên lai chỉ lưu trên điện thoại để tránh làm tài liệu Firestore quá lớn; các dữ liệu còn lại của buổi chơi được đồng bộ.
 
 ## ▶️ Cài đặt và chạy
 
@@ -48,24 +50,27 @@ git clone https://github.com/nguyentuankiet210666/ShuttleUp-Hosting.git
 2. Chờ Gradle Sync hoàn tất.
 3. Kết nối điện thoại đã bật **USB debugging** hoặc chọn Android Emulator.
 4. Chọn **Run ▶** để build và cài ứng dụng.
-5. Khi chưa cấu hình Firebase, tiếp tục sử dụng chế độ dữ liệu cục bộ như hiện tại; phần tài khoản sẽ hướng dẫn thêm `google-services.json`.
+5. Nếu chưa cấu hình Firebase, các chức năng quản lý cục bộ vẫn hoạt động; tài khoản và đồng bộ cần `google-services.json`.
 
 ## ☁️ Kế hoạch đồng bộ Firebase
 
-Xem hướng dẫn chi tiết tại [FIREBASE_SETUP.md](FIREBASE_SETUP.md). Hướng triển khai là xác thực tài khoản host, lưu dữ liệu theo `users/{uid}`, áp dụng Firestore Security Rules và đồng bộ giữa các thiết bị.
-
-**Firebase hiện chưa phải tính năng đã hoàn thiện.**
+Xem hướng dẫn chi tiết tại [FIREBASE_SETUP.md](FIREBASE_SETUP.md). Dữ liệu cộng đồng được tổ chức theo `groups/{groupId}` với thành viên, buổi chơi, yêu cầu tham gia và tin nhắn. Quyền truy cập được kiểm soát bằng Firestore Security Rules.
 
 ## 🗺️ Lộ trình phát triển
 
 - [x] Ứng dụng chạy trên thiết bị Android
 - [x] Quản lý người chơi, set và các khoản thanh toán cục bộ
 - [x] Tạo tài khoản, đăng nhập và xác minh email bằng Firebase
+- [x] Cấu hình Firebase project và file `google-services.json`
+- [x] Đồng bộ Firestore với phân quyền theo nhóm
+- [x] Lịch sử nhiều buổi chơi theo ngày
+- [x] Hồ sơ nhóm, khu vực và trạng thái công khai
 - [ ] Hoàn thiện giao diện xếp set tối ưu cho điện thoại
-- [ ] Cấu hình Firebase project và file `google-services.json`
+- [ ] Khám phá và tìm nhóm công khai theo khu vực
+- [ ] Gửi yêu cầu tham gia và quản lý thành viên
+- [ ] Bảng tin / trò chuyện trong nhóm
+- [ ] Tạo lịch chơi và nhận đăng ký tham gia
 - [ ] Đăng nhập bằng Google / số điện thoại
-- [ ] Đồng bộ Firestore với phân quyền theo tài khoản
-- [ ] Lịch sử nhiều buổi chơi và đồng bộ nhiều điện thoại
 - [ ] Kết nối Google Sheets (nếu cần)
 - [ ] Báo cáo, thống kê doanh thu
 - [ ] Bổ sung ảnh giao diện và video demo
