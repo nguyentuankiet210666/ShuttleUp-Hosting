@@ -2,7 +2,7 @@
 
 **Hosting** là ứng dụng Android hỗ trợ người tổ chức (host) quản lý một buổi chơi cầu lông trên điện thoại: người chơi, phân set, số cầu và thanh toán.
 
-> **Trạng thái:** Đang phát triển. Các chức năng quản lý hiện lưu dữ liệu **cục bộ trên thiết bị**; đăng nhập và đồng bộ Firebase **chưa được tích hợp hoàn chỉnh**.
+> **Trạng thái:** Đang phát triển. Ứng dụng đã có tạo tài khoản và đăng nhập Firebase bằng email/mật khẩu. Dữ liệu quản lý buổi chơi vẫn lưu **cục bộ trên thiết bị** và chưa đồng bộ Firestore.
 
 ## ✨ Chức năng đang có
 
@@ -14,6 +14,7 @@
 | 🧾 Biên lai | Chụp hoặc chọn ảnh biên lai chuyển khoản |
 | 🪶 Cầu | Theo dõi số lượng và đơn giá cầu |
 | 📊 Tổng hợp | Xem tổng tiền trong buổi chơi |
+| 👤 Tài khoản | Tạo tài khoản, đăng nhập, xác minh email và đăng xuất |
 
 ## 📱 Giao diện và demo
 
@@ -30,7 +31,8 @@
 - **Kotlin**: ứng dụng Android và WebView.
 - **HTML/CSS/JavaScript**: giao diện trong `app/src/main/assets/index.html`.
 - **localStorage**: lưu trạng thái dữ liệu hiện tại ngay trên thiết bị.
-- **Firebase Authentication / Cloud Firestore**: đã có phần chuẩn bị dependency, chưa hoàn tất cấu hình và kết nối sử dụng thực tế.
+- **Firebase Authentication**: tạo tài khoản và đăng nhập bằng email/mật khẩu.
+- **Cloud Firestore**: đã chuẩn bị dependency và security rules, chưa đồng bộ dữ liệu buổi chơi.
 
 **Lưu ý dữ liệu:** Chưa có đồng bộ đám mây. Không nên xóa dữ liệu ứng dụng hoặc gỡ cài đặt nếu chưa sao lưu thông tin cần giữ.
 
@@ -46,7 +48,7 @@ git clone https://github.com/nguyentuankiet210666/ShuttleUp-Hosting.git
 2. Chờ Gradle Sync hoàn tất.
 3. Kết nối điện thoại đã bật **USB debugging** hoặc chọn Android Emulator.
 4. Chọn **Run ▶** để build và cài ứng dụng.
-5. Khi chưa cấu hình Firebase, tiếp tục sử dụng chế độ dữ liệu cục bộ như hiện tại.
+5. Khi chưa cấu hình Firebase, tiếp tục sử dụng chế độ dữ liệu cục bộ như hiện tại; phần tài khoản sẽ hướng dẫn thêm `google-services.json`.
 
 ## ☁️ Kế hoạch đồng bộ Firebase
 
@@ -58,7 +60,7 @@ Xem hướng dẫn chi tiết tại [FIREBASE_SETUP.md](FIREBASE_SETUP.md). Hư�
 
 - [x] Ứng dụng chạy trên thiết bị Android
 - [x] Quản lý người chơi, set và các khoản thanh toán cục bộ
-- [x] Chuẩn bị dependency Firebase
+- [x] Tạo tài khoản, đăng nhập và xác minh email bằng Firebase
 - [ ] Hoàn thiện giao diện xếp set tối ưu cho điện thoại
 - [ ] Cấu hình Firebase project và file `google-services.json`
 - [ ] Đăng nhập bằng Google / số điện thoại
@@ -75,3 +77,4 @@ Không đưa API key bí mật, mật khẩu, file ký ứng dụng (`.jks`/`.ke
 ---
 
 **Dự án cá nhân đang phát triển**, ưu tiên thao tác nhanh, rõ ràng trên điện thoại dành cho host cầu lông.
+
