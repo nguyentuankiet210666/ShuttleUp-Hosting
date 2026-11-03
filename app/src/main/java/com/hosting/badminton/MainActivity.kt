@@ -23,10 +23,21 @@ import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowCompat
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.FirebaseNetworkException
+import org.json.JSONObject
 import java.io.File
 
 class MainActivity : ComponentActivity() {
     private lateinit var webView: WebView
+    private var firebaseAuth: FirebaseAuth? = null
+    private var authStateListener: FirebaseAuth.AuthStateListener? = null
     private var pendingCallback: ValueCallback<Array<Uri>>? = null
     private var pendingUri: Uri? = null
     @Volatile private var stagedPhoto: Uri? = null
@@ -45,6 +56,127 @@ class MainActivity : ComponentActivity() {
                 publishedPhoto = uri
                 true
             } catch (e: Exception) { false }
+        }
+    }
+
+    inner class AuthBridge {
+        @JavascriptInterface
+        fun requestState() = sendAuthState()
+
+        @JavascriptInterface
+        fun signUp(name: String, email: String, password: String) {
+            val auth = requireAuth() ?: return
+            val cleanName = name.trim()
+            val cleanEmail = email.trim()
+            if (cleanName.isBlank() || cleanEmail.isBlank() || password.length < 6) {
+                sendAuthResult(false, "Vui lòng nhập họ tên, email và mật khẩu từ 6 ký tự.")
+                return
+            }
+            auth.createUserWithEmailAndPassword(cleanEmail, password)
+                .addOnSuccessListener { result ->
+                    val user = result.user ?: run {
+                        sendAuthResult(false, "Không tạo được tài khoản. Vui lòng thử lại.")
+                        return@addOnSuccessListener
+                    }
+                    val profile = UserProfileChangeRequest.Builder().setDisplayName(cleanName).build()
+                    user.updateProfile(profile).addOnCompleteListener {
+                        user.sendEmailVerification().addOnCompleteListener {
+                            sendAuthResult(
+                                true,
+                                "Đã tạo tài khoản. Hãy kiểm tra email để xác minh.",
+                                currentUserJson()
+                            )
+                        }
+                    }
+                }
+                .addOnFailureListener { sendAuthError(it) }
+        }
+
+        @JavascriptInterface
+        fun signIn(email: String, password: String) {
+            val auth = requireAuth() ?: return
+            val cleanEmail = email.trim()
+            if (cleanEmail.isBlank() || password.isBlank()) {
+                sendAuthResult(false, "Vui lòng nhập email và mật khẩu.")
+                return
+            }
+            auth.signInWithEmailAndPassword(cleanEmail, password)
+                .addOnSuccessListener {
+                    sendAuthResult(true, "Đăng nhập thành công.", currentUserJson())
+                }
+                .addOnFailureListener { sendAuthError(it) }
+        }
+
+        @JavascriptInterface
+        fun signOut() {
+            firebaseAuth?.signOut()
+            sendAuthResult(true, "Đã đăng xuất.", JSONObject.NULL)
+        }
+
+        @JavascriptInterface
+        fun sendVerification() {
+            val user = firebaseAuth?.currentUser
+            if (user == null) {
+                sendAuthResult(false, "Bạn chưa đăng nhập.")
+                return
+            }
+            user.sendEmailVerification()
+                .addOnSuccessListener {
+                    sendAuthResult(true, "Đã gửi lại email xác minh.", currentUserJson())
+                }
+                .addOnFailureListener { sendAuthError(it) }
+        }
+    }
+
+    private fun requireAuth(): FirebaseAuth? {
+        val auth = firebaseAuth
+        if (auth == null) {
+            sendAuthResult(
+                false,
+                "Firebase chưa được cấu hình. Hãy thêm app/google-services.json và bật Email/Mật khẩu."
+            )
+        }
+        return auth
+    }
+
+    private fun currentUserJson(): Any {
+        val user = firebaseAuth?.currentUser ?: return JSONObject.NULL
+        return JSONObject().apply {
+            put("uid", user.uid)
+            put("name", user.displayName ?: "")
+            put("email", user.email ?: "")
+            put("verified", user.isEmailVerified)
+        }
+    }
+
+    private fun sendAuthState() {
+        sendAuthResult(true, "", currentUserJson())
+    }
+
+    private fun sendAuthError(error: Exception) {
+        val message = when (error) {
+            is FirebaseAuthWeakPasswordException -> "Mật khẩu cần ít nhất 6 ký tự."
+            is FirebaseAuthUserCollisionException -> "Email này đã có tài khoản."
+            is FirebaseAuthInvalidUserException -> "Không tìm thấy tài khoản này."
+            is FirebaseAuthInvalidCredentialsException -> "Email hoặc mật khẩu chưa đúng."
+            is FirebaseNetworkException -> "Không có kết nối mạng. Vui lòng thử lại."
+            else -> "Không thực hiện được. Vui lòng thử lại sau."
+        }
+        sendAuthResult(false, message)
+    }
+
+    private fun sendAuthResult(ok: Boolean, message: String, user: Any? = null) {
+        if (!::webView.isInitialized) return
+        val payload = JSONObject().apply {
+            put("ok", ok)
+            put("message", message)
+            if (user != null) put("user", user)
+        }.toString()
+        webView.post {
+            webView.evaluateJavascript(
+                "window.HostingAuth&&window.HostingAuth.handleResult(${JSONObject.quote(payload)})",
+                null
+            )
         }
     }
     private val choosePhoto = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -134,6 +266,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        firebaseAuth = if (FirebaseApp.getApps(this).isNotEmpty()) {
+            runCatching { FirebaseAuth.getInstance() }.getOrNull()
+        } else null
         // The HTML keeps a compressed copy after confirmation. Remove old temporary captures.
         val photoDir = File(cacheDir, "receipt-camera").apply { mkdirs() }
         photoDir.listFiles()?.filter { System.currentTimeMillis() - it.lastModified() > 86400000L }
@@ -143,7 +278,12 @@ class MainActivity : ComponentActivity() {
             settings.domStorageEnabled = true
             settings.allowContentAccess = true
             addJavascriptInterface(ReceiptBridge(), "HostingReceipt")
+            addJavascriptInterface(AuthBridge(), "HostingAuthNative")
             webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    super.onPageFinished(view, url)
+                    if (url == "file:///android_asset/index.html") sendAuthState()
+                }
                 override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                     return request?.url?.toString() != "file:///android_asset/index.html"
                 }
@@ -196,6 +336,23 @@ class MainActivity : ComponentActivity() {
         }
         ViewCompat.requestApplyInsets(container)
         webView.loadUrl("file:///android_asset/index.html")
+        firebaseAuth?.let {
+            authStateListener = FirebaseAuth.AuthStateListener { sendAuthState() }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val auth = firebaseAuth
+        val listener = authStateListener
+        if (auth != null && listener != null) auth.addAuthStateListener(listener)
+    }
+
+    override fun onStop() {
+        val auth = firebaseAuth
+        val listener = authStateListener
+        if (auth != null && listener != null) auth.removeAuthStateListener(listener)
+        super.onStop()
     }
 
     override fun onDestroy() {
@@ -205,3 +362,4 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
     }
 }
+
