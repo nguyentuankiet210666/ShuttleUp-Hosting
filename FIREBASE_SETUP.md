@@ -28,15 +28,25 @@ File này đã được thêm vào `.gitignore` để tránh commit nhầm cấu
 
 Sau khi file tồn tại, Gradle sẽ tự áp dụng plugin Google Services.
 
-## 3. Bật Authentication
+## 3. Bật Authentication bằng Email/Mật khẩu
 
 Trong Firebase Console:
 
 - Authentication → Sign-in method
-- Bật Google
-- Phone có thể bật ở bước sau
+- Bật **Email/Password**
+- Không cần bật Email link (passwordless) ở phiên bản hiện tại
+- Ứng dụng sẽ gửi email xác minh sau khi tạo tài khoản
+- Google và Phone có thể bật ở bước sau
 
 Không cần nhét mật khẩu Google hay secret vào source code.
+
+Sau khi bật, chạy ứng dụng và mở **Cài đặt → Tài khoản** để:
+
+1. Tạo tài khoản bằng họ tên, email và mật khẩu từ 6 ký tự.
+2. Mở email xác minh do Firebase gửi.
+3. Đăng nhập lại và kiểm tra tên/email hiển thị trong ứng dụng.
+
+Nếu chưa có `google-services.json`, ứng dụng vẫn chạy các chức năng quản lý cục bộ và sẽ hiển thị hướng dẫn cấu hình khi người dùng thử đăng nhập.
 
 ## 4. Tạo Firestore
 
@@ -76,11 +86,14 @@ cho app thật, vì như vậy bất kỳ client nào cũng có thể đọc ho�
 
 ## 6. Thứ tự tích hợp tiếp theo
 
-1. Google Login
+1. Email/Password Login
 2. Lấy Firebase UID
 3. Tạo `users/{uid}`
 4. Chuyển dữ liệu session/player từ localStorage lên Firestore
 5. Giữ localStorage làm cache/offline tạm thời
 6. Thêm listener Firestore để đồng bộ nhiều máy
 
+Google Login có thể bổ sung sau khi luồng tài khoản email hoạt động ổn định.
+
 Trong giai đoạn chuyển đổi, không xoá localStorage ngay để tránh mất dữ liệu đang có.
+
