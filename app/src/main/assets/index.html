@@ -160,6 +160,7 @@
         #sets{padding-bottom:83px}
         .set-action{bottom:calc(0px + env(safe-area-inset-bottom,0px))}
         @media(max-width:350px){.top-nav{padding:2px 6px}.top-nav .wrap{gap:4px}.top-nav button{min-height:44px}}
+        .auth-card{margin-bottom:10px}.auth-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.auth-head h2{margin:0}.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}.auth-tabs button{min-height:42px;border:1px solid var(--line);background:#f5f8fb;color:#526c82}.auth-tabs button.active{border-color:#8db8f2;background:#e8f1ff;color:#1256ad}.auth-form{display:grid;gap:10px}.auth-form label{display:grid;gap:5px;color:#526c82;font-size:12px;font-weight:650}.auth-form input{font-size:16px}.auth-message{border-radius:9px;padding:9px 10px;font-size:12px;line-height:1.45;background:#edf4ff;color:#215baf}.auth-message.error{background:#fff0ee;color:#a32920}.auth-message.success{background:#edf9f1;color:#197342}.account-box{display:flex;align-items:center;gap:10px}.account-avatar{display:grid;place-items:center;flex:0 0 42px;height:42px;border-radius:50%;background:#e8f1ff;color:#1256ad;font-weight:800;font-size:18px}.account-info{min-width:0;flex:1}.account-info strong,.account-info span{display:block;overflow-wrap:anywhere}.account-info span{margin-top:2px;color:#65788a;font-size:12px}.account-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.auth-loading{opacity:.65;pointer-events:none}
 
     </style>
 </head>
@@ -201,7 +202,32 @@
     <div class="set-action-count"><small>Đã chọn</small><strong id="selectionCount" aria-live="polite">0/4 người</strong></div>
     <button id="confirmSet" type="button" class="primary" disabled>✓ Xác nhận +1 set</button>
   </div>
-</section><section id="settings" hidden><div class="card"><h2 class="section-title">Cài đặt</h2><p class="hint">Hosting · Bản demo mobile</p><p class="hint">Thay đổi được lưu tự động trên thiết bị.</p><label class="settings-date">Ngày buổi chơi<input id="sessionDate" type="date" aria-label="Ngày buổi chơi"></label><p class="hint">Ngày này là nhãn của buổi chơi hiện tại, chưa tạo lịch sử buổi riêng.</p><label for="shuttlePrice" class="label">Đơn giá mỗi quả cầu (đồng)</label><input id="shuttlePrice" type="number" inputmode="numeric" min="0" max="999999999" step="1" value="0"><p id="shuttlePriceError" class="hint" role="alert" hidden></p><p class="hint">Tự tính tiền cầu ở Trang chủ. Tiền cầu được thống kê riêng.</p><button id="sheets" class="wide">Google Sheets · Chưa kết nối</button></div></section></main>
+</section><section id="settings" hidden>
+  <div class="card auth-card">
+    <div class="auth-head"><h2 class="section-title">Tài khoản</h2><span id="authBadge" class="hint">Chưa đăng nhập</span></div>
+    <div id="authGuest">
+      <div class="auth-tabs" role="tablist" aria-label="Tài khoản">
+        <button id="loginTab" type="button" class="active" role="tab" aria-selected="true">Đăng nhập</button>
+        <button id="registerTab" type="button" role="tab" aria-selected="false">Tạo tài khoản</button>
+      </div>
+      <form id="authForm" class="auth-form">
+        <label id="authNameField" hidden>Họ tên<input id="authName" maxlength="70" autocomplete="name"></label>
+        <label>Email<input id="authEmail" type="email" maxlength="254" autocomplete="email" required></label>
+        <label>Mật khẩu<input id="authPassword" type="password" minlength="6" maxlength="128" autocomplete="current-password" required></label>
+        <label id="authConfirmField" hidden>Nhập lại mật khẩu<input id="authConfirm" type="password" minlength="6" maxlength="128" autocomplete="new-password"></label>
+        <button id="authSubmit" class="primary wide" type="submit">Đăng nhập</button>
+      </form>
+      <p class="hint">Tài khoản dùng để đồng bộ nhóm và buổi chơi ở các bước phát triển tiếp theo.</p>
+    </div>
+    <div id="authUser" hidden>
+      <div class="account-box"><span id="accountAvatar" class="account-avatar">H</span><div class="account-info"><strong id="accountName">Người dùng</strong><span id="accountEmail"></span></div></div>
+      <p id="verificationNote" class="hint" hidden>Email chưa được xác minh. Hãy kiểm tra hộp thư của bạn.</p>
+      <div class="account-actions"><button id="verifyEmail" type="button">Gửi lại xác minh</button><button id="logout" type="button" class="danger">Đăng xuất</button></div>
+    </div>
+    <p id="authMessage" class="auth-message" role="status" hidden></p>
+  </div>
+  <div class="card"><h2 class="section-title">Cài đặt buổi chơi</h2><p class="hint">Thay đổi được lưu tự động trên thiết bị.</p><label class="settings-date">Ngày buổi chơi<input id="sessionDate" type="date" aria-label="Ngày buổi chơi"></label><p class="hint">Ngày này là nhãn của buổi chơi hiện tại, chưa tạo lịch sử buổi riêng.</p><label for="shuttlePrice" class="label">Đơn giá mỗi quả cầu (đồng)</label><input id="shuttlePrice" type="number" inputmode="numeric" min="0" max="999999999" step="1" value="0"><p id="shuttlePriceError" class="hint" role="alert" hidden></p><p class="hint">Tự tính tiền cầu ở Trang chủ. Tiền cầu được thống kê riêng.</p><button id="sheets" class="wide">Google Sheets · Chưa kết nối</button></div>
+</section></main>
 
 <div id="paymentOverlay" class="overlay" hidden><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="paymentTitle" tabindex="-1"><div class="handle"></div><div class="sheet-head"><h2 id="paymentTitle">Check thanh toán</h2><button class="close" data-close aria-label="Đóng">×</button></div><div class="payment-info"><span id="paymentName"></span><strong id="paymentAmount"></strong></div><input id="receiptCamera" type="file" accept="image/*" capture="environment" hidden><input id="receiptGallery" type="file" accept="image/*" hidden><div id="receiptSources" hidden><p class="hint">Chọn ảnh chuyển khoản</p><div class="receipt-sources"><button id="takeReceipt">Chụp ảnh</button><button id="pickReceipt">Chọn từ Thư viện</button></div></div><div id="receiptArea" hidden><img id="receiptPreview" alt="Ảnh chuyển khoản" style="display:block;width:100%;max-height:240px;object-fit:contain;border-radius:8px;margin:8px 0"><button id="confirmReceipt" class="primary wide" hidden>Lưu ảnh và xác nhận chuyển khoản</button><p class="hint">Ảnh chỉ được gắn với người chơi khi bấm xác nhận. Ảnh chụp mới sẽ lưu vào Pictures/Hosting; ảnh chọn từ Thư viện không tạo bản trùng.</p></div><div class="pay-buttons"><button class="cash" data-pay="cash">Tiền mặt</button><button class="transfer" data-pay="transfer">Chuyển khoản</button><button class="unpaid" data-pay="unpaid">Chưa thanh toán</button></div></section></div>
 <div id="editOverlay" class="overlay" hidden><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="editTitle" tabindex="-1"><div class="handle"></div><div class="sheet-head"><h2 id="editTitle">Thêm người chơi</h2><button class="close" data-close aria-label="Đóng">×</button></div><form id="playerForm"><div class="form-grid"><label class="full">Tên người chơi<input id="playerName" required maxlength="70" autocomplete="off"></label><label>Giờ vào<input id="timeIn" type="time" required></label><label>Giờ ra (nếu đã xong)<input id="timeOut" type="time"></label></div><button class="primary wide" type="submit">Lưu người chơi</button><button id="deletePlayer" class="danger wide" type="button" hidden>Xóa người chơi</button></form></section></div>
@@ -217,6 +243,61 @@
     const money=n=>n.toLocaleString('vi-VN')+'đ',total=p=>p.money+p.water;
     function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){$('storageWarning').hidden=false}}
     function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,2500)}
+    let authMode='login',authBusy=false;
+    function setAuthMode(mode){
+      authMode=mode;const register=mode==='register';
+      $('loginTab').classList.toggle('active',!register);$('registerTab').classList.toggle('active',register);
+      $('loginTab').setAttribute('aria-selected',String(!register));$('registerTab').setAttribute('aria-selected',String(register));
+      $('authNameField').hidden=!register;$('authConfirmField').hidden=!register;
+      $('authName').required=register;$('authConfirm').required=register;
+      $('authPassword').autocomplete=register?'new-password':'current-password';
+      $('authSubmit').textContent=register?'Tạo tài khoản':'Đăng nhập';showAuthMessage('');
+    }
+    function showAuthMessage(message,type=''){
+      $('authMessage').hidden=!message;$('authMessage').textContent=message;
+      $('authMessage').className='auth-message'+(type?' '+type:'');
+    }
+    function setAuthBusy(busy){
+      authBusy=busy;$('authForm').classList.toggle('auth-loading',busy);
+      $('authForm').querySelectorAll('input,button').forEach(el=>el.disabled=busy);
+      $('logout').disabled=busy;$('verifyEmail').disabled=busy;
+    }
+    function renderAuth(user){
+      const signedIn=Boolean(user&&user.uid);
+      $('authGuest').hidden=signedIn;$('authUser').hidden=!signedIn;
+      $('authBadge').textContent=signedIn?'Đã đăng nhập':'Chưa đăng nhập';
+      if(!signedIn)return;
+      const name=(user.name||'').trim()||'Người chơi';
+      $('accountName').textContent=name;$('accountEmail').textContent=user.email||'';
+      $('accountAvatar').textContent=(name.charAt(0)||'H').toUpperCase();
+      $('verificationNote').hidden=Boolean(user.verified);$('verifyEmail').hidden=Boolean(user.verified);
+    }
+    window.HostingAuth={
+      handleResult(payload){
+        let result;try{result=typeof payload==='string'?JSON.parse(payload):payload}catch(e){return}
+        setAuthBusy(false);
+        if(result.user!==undefined)renderAuth(result.user);
+        if(result.message)showAuthMessage(result.message,result.ok?'success':'error');
+      }
+    };
+    $('loginTab').onclick=()=>setAuthMode('login');$('registerTab').onclick=()=>setAuthMode('register');
+    $('authForm').onsubmit=e=>{
+      e.preventDefault();if(authBusy)return;
+      const email=$('authEmail').value.trim(),password=$('authPassword').value;
+      if(authMode==='register'){
+        const name=$('authName').value.trim();
+        if(!name){showAuthMessage('Vui lòng nhập họ tên.','error');$('authName').focus();return}
+        if(password!==$('authConfirm').value){showAuthMessage('Hai mật khẩu chưa khớp.','error');$('authConfirm').focus();return}
+      }
+      const bridge=window.HostingAuthNative;
+      if(!bridge){showAuthMessage('Tính năng tài khoản chỉ hoạt động trong ứng dụng Android đã cấu hình Firebase.','error');return}
+      setAuthBusy(true);showAuthMessage(authMode==='register'?'Đang tạo tài khoản…':'Đang đăng nhập…');
+      if(authMode==='register')bridge.signUp($('authName').value.trim(),email,password);else bridge.signIn(email,password);
+    };
+    $('logout').onclick=()=>{const bridge=window.HostingAuthNative;if(bridge){setAuthBusy(true);bridge.signOut()}};
+    $('verifyEmail').onclick=()=>{const bridge=window.HostingAuthNative;if(bridge){setAuthBusy(true);bridge.sendVerification()}};
+    setAuthMode('login');
+    if(window.HostingAuthNative)window.HostingAuthNative.requestState();
     const isDone=p=>p.payment==='cash'||p.payment==='transfer'||Boolean(p.end);
     function renderTotals(){ const paid=state.players.filter(p=>p.payment!=='unpaid'),received=paid.reduce((n,p)=>n+total(p),0),waterPaid=paid.reduce((n,p)=>n+p.water,0),water=state.players.reduce((n,p)=>n+p.water,0);$('receivedTotal').textContent=money(received);$('waterTotal').textContent=money(water);$('waterPaid').textContent=money(waterPaid);$('waterUnpaid').textContent=money(water-waterPaid);$('hostTotal').textContent=money(received-waterPaid); $('cashTotal').textContent=money(state.players.filter(p=>p.payment==='cash').reduce((n,p)=>n+total(p),0));$('transferTotal').textContent=money(state.players.filter(p=>p.payment==='transfer').reduce((n,p)=>n+total(p),0)); $('grandTotal').textContent=money(state.players.reduce((n,p)=>n+total(p),0));$('unpaidTotal').textContent=money(state.players.filter(p=>p.payment==='unpaid').reduce((n,p)=>n+total(p),0)); }
     function totalMarkup(p){return `<span style="font-size:11px">Tổng</span><span class="amount">${money(total(p))}</span><small>${p.payment==='unpaid'?'':'✓ '}${statuses[p.payment]}</small>`}
@@ -358,3 +439,4 @@
 </script>
 </body>
 </html>
+
