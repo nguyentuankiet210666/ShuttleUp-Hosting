@@ -81,7 +81,7 @@ Rule hiện tại cho phép:
 - Người dùng chỉ đọc/sửa hồ sơ của chính mình.
 - Người đã đăng nhập xem danh sách nhóm công khai.
 - Chỉ chủ nhóm sửa hồ sơ nhóm và duyệt yêu cầu tham gia.
-- Thành viên nhóm đọc/sửa dữ liệu buổi chơi và đọc/gửi tin nhắn.
+- Chủ nhóm tạo, sửa và xóa dữ liệu buổi chơi; thành viên chỉ đọc dữ liệu buổi chơi và có thể đọc/gửi tin nhắn.
 - Người gửi chỉ sửa hoặc xóa tin nhắn của chính họ.
 
 Không dùng rule kiểu:
@@ -98,7 +98,7 @@ cho app thật, vì như vậy bất kỳ client nào cũng có thể đọc ho�
 2. Tạo/cập nhật hồ sơ `users/{uid}` và nhóm mặc định `groups/{uid}`.
 3. Mỗi ngày được lưu thành một tài liệu trong `sessions/{yyyy-MM-dd}`.
 4. Listener Firestore nhận thay đổi để cập nhật thiết bị đang mở cùng buổi chơi.
-5. `localStorage` tiếp tục làm cache và giữ dữ liệu khi ngoại tuyến.
+5. `localStorage` tiếp tục làm cache khi ngoại tuyến nhưng được tách theo Firebase UID. Dữ liệu từ phiên bản cũ chỉ được nhập vào tài khoản sau khi người dùng xác nhận.
 6. Ảnh biên lai không tải lên Firestore; ảnh chỉ nằm trên thiết bị.
 
 ## 7. Bước cộng đồng tiếp theo
@@ -109,5 +109,5 @@ cho app thật, vì như vậy bất kỳ client nào cũng có thể đọc ho�
 4. Bảng tin hoặc trò chuyện theo nhóm.
 5. Tạo lịch chơi, giới hạn số người và đăng ký tham gia.
 
-Trong giai đoạn chuyển đổi, không xoá localStorage ngay để tránh mất dữ liệu đang có.
+Trong giai đoạn chuyển đổi, dữ liệu `localStorage` cũ được giữ trong vùng khách. Ứng dụng phải hỏi người dùng trước khi nhập dữ liệu đó vào một tài khoản Firebase, tránh lẫn dữ liệu giữa hai tài khoản.
 
