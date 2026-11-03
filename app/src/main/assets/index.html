@@ -466,12 +466,12 @@
       safe.players.forEach(player=>delete player.receipt);
       return JSON.stringify(safe);
     }
-    function connectCloud(){
+    function connectCloud(createIfMissing=false){
       const bridge=window.HostingCloudNative;
       if(!currentUser||!bridge)return;
       if(!sessions[state.date]){setSyncStatus('Chưa có buổi chơi');return}
       clearTimeout(cloudTimer);setSyncStatus('Đang kết nối…','syncing');
-      bridge.connect(state.date,cloudPayload());
+      bridge.connect(state.date,cloudPayload(),Boolean(createIfMissing));
     }
     function scheduleCloudSync(){
       if(applyingCloud||!currentUser||!window.HostingCloudNative)return;
@@ -731,7 +731,7 @@
       if(!start||!end||end<=start){fail('Giờ kết thúc phải sau giờ bắt đầu.');return}
       if(!Number.isSafeInteger(capacity)||capacity<2||capacity>40){fail('Số người tối đa từ 2 đến 40.');return}
       try{persistLocal()}catch(err){$('storageWarning').hidden=false}
-      const price=state.shuttles&&state.shuttles.price||0;state=emptySession(date,price,{title,start,end,venue,capacity});sessions[date]=state;selected.clear();persistLocal();renderShuttles();render();closeSheet();connectCloud();scheduleCloudSync();showPage('home');toast('Đã tạo buổi chơi mới');
+      const price=state.shuttles&&state.shuttles.price||0;state=emptySession(date,price,{title,start,end,venue,capacity});sessions[date]=state;selected.clear();persistLocal();renderShuttles();render();closeSheet();connectCloud(true);showPage('home');toast('Đã tạo buổi chơi mới');
     };
     $('ownerSessionList').onclick=e=>{
       const open=e.target.closest('[data-open-session]'),remove=e.target.closest('[data-delete-session]');
